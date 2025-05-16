@@ -1,0 +1,53 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace DirectoryProject.DirectoryService.WebAPI;
+
+public class DepartmentsController : ApplicationController
+{
+    [HttpGet("roots")]
+    public async Task<IActionResult> GetRoots()
+    {
+        //страницы корней + prefetch детей.
+        return Ok();
+    }
+
+    [HttpGet("{id:guid}/children")]
+    public async Task<IActionResult> GetChildren()
+    {
+        //лениво загружать уровни.
+        return Ok();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {
+        //вернуть найденный отдел, предков и поддерево.
+        return Ok();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create()
+    {
+        //создание отдела
+        //    Валидация имени, родителя, локаций.
+        //    Автоматический расчёт slug, Path, Depth, ChildrenCount.
+        return Ok();
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update()
+    {
+        //обновление отдела
+        //    Валидация имени, родителя, локаций.
+        //    Автоматический расчёт slug, Path, Depth, ChildrenCount.
+        return Ok();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete()
+    {
+        //soft-delete отдела
+        //    запрет, если есть активные потомки.
+        return Ok();
+    }
+}
