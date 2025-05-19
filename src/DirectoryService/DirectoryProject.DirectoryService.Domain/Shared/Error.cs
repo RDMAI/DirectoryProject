@@ -1,4 +1,4 @@
-﻿namespace DirectoryProject.DirectoryService.Domain;
+﻿namespace DirectoryProject.DirectoryService.Domain.Shared;
 
 public record Error
 {

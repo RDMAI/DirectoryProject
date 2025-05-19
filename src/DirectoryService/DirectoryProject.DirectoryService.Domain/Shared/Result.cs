@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace DirectoryProject.DirectoryService.Domain;
+namespace DirectoryProject.DirectoryService.Domain.Shared;
 
 public record Result<TValue>
 {
@@ -46,8 +46,8 @@ public record UnitResult
     public static UnitResult Success() => new UnitResult();
     public static UnitResult Error(List<Error> errors) => new UnitResult(errors: errors);
 
-    public static implicit operator UnitResult(List<Error> errors) => UnitResult.Error(errors);
-    public static implicit operator UnitResult(Error error) => UnitResult.Error([error]);
+    public static implicit operator UnitResult(List<Error> errors) => Error(errors);
+    public static implicit operator UnitResult(Error error) => Error([error]);
 
     // for debugging
     public override string ToString()

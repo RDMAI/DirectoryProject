@@ -243,6 +243,9 @@ tab_width = 4
 
 #STYLE COP ANALYZERS
 dotnet_diagnostic.SA0001.severity = none
+dotnet_diagnostic.SA1127.severity = none
+dotnet_diagnostic.SA1128.severity = none
+dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1500.severity = none
 dotnet_diagnostic.SA1502.severity = none
 dotnet_diagnostic.SA1508.severity = none
