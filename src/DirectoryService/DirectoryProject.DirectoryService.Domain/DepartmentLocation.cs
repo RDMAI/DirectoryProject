@@ -9,6 +9,14 @@ public class DepartmentLocation
     public Id<Location> LocationId { get; }
     public Location Location { get; }
 
+    public DepartmentLocation(
+        Id<Department> departmentId,
+        Id<Location> locationId)
+    {
+        DepartmentId = departmentId;
+        LocationId = locationId;
+    }
+
     // EF Core
-    public DepartmentLocation() {}
+    private DepartmentLocation() {}
 }
