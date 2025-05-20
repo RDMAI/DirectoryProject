@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Domain;
+﻿using DirectoryProject.DirectoryService.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryProject.DirectoryService.WebAPI;

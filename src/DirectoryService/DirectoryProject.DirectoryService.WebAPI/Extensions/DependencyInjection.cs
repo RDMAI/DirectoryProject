@@ -15,6 +15,8 @@ public static class DependencyInjection
         services.AddSwaggerGen();
         services.AddAPILogging(configuration);
 
+        Infrastructure.DependencyInjection.AddInfrastructure(services, configuration);
+
         return services;
     }
 
