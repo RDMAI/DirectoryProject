@@ -67,7 +67,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         {
             ib.Property(i => i.Value)
                 .IsRequired()
-                .HasMaxLength(IANATimeZone.MAX_LENGTH)
                 .HasColumnName("time_zone");
         });
 

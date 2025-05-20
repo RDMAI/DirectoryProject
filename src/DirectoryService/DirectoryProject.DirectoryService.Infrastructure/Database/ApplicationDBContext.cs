@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using DirectoryProject.DirectoryService.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.Database;
 
@@ -14,6 +14,10 @@ public class ApplicationDBContext : DbContext
     {
         _connectionString = connectionString;
     }
+
+    public DbSet<Department> Departments { get; set; }
+    public DbSet<Location> Locations { get; set; }
+    public DbSet<Position> Positions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
