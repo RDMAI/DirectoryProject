@@ -13,12 +13,13 @@ public class Department
     public Department? Parent { get; }
     public LTree Path { get; }
     public short Depth { get; }
-    public int ChildrenCount { get; }
+    public int ChildrenCount { get; private set; }
     public bool IsActive { get; } = true;
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; }
 
-    public List<DepartmentLocation> DepartmentLocations { get; } = [];
+    private readonly List<DepartmentLocation> _departmentLocations = [];
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
 
     public static Result<Department> Create(
         Id<Department> id,
@@ -44,6 +45,12 @@ public class Department
             depth,
             childrenCount,
             createdAt);
+    }
+
+    public Department IncreaseChildrenCount()
+    {
+        ChildrenCount++;
+        return this;
     }
 
     // EF Core

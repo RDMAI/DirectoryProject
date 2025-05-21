@@ -34,7 +34,7 @@ public static class ErrorHelper
         public static Error AlreadyExist(string? name = null)
         {
             var label = name ?? DEFAULT_LABEL_VALUE;
-            return Error.Validation("record.exists", $"{label} exists");
+            return Error.Conflict("record.exists", $"{label} exists");
         }
     }
 }

@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddAPILogging(configuration);
 
         Infrastructure.DependencyInjection.AddInfrastructure(services, configuration);
+        Application.DependencyInjection.AddApplication(services, configuration);
 
         return services;
     }
