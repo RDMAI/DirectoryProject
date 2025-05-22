@@ -2,6 +2,7 @@
   "ReplaceChars": [
     // Special characters
     { "&": "-and-" },
+    { "/": "-" },
 
     // Cyrillic
     { "а": "a" },

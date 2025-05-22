@@ -1,4 +1,5 @@
 ﻿using DirectoryProject.DirectoryService.Application.Interfaces;
+using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Infrastructure.Database;
 using DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,10 @@ public static class DependencyInjection
         services.AddScoped(_ => new ApplicationDBContext(dbConnectionString));
 
         services.AddScoped<ILocationRepository, LocationRepository>();
+        services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        services.AddScoped<IPositionRepository, PositionRepository>();
+
+        services.AddScoped<IUnitOfWork, DirectoryServiceUnitOfWork>();
 
         return services;
     }

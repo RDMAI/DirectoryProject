@@ -1,4 +1,5 @@
 ﻿using DirectoryProject.DirectoryService.WebAPI.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Serilog.Events;
 
@@ -10,6 +11,14 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // disables controller's filter, that validaties model state before entering controller;
+        // instead, it will pass invalid model to controller and then to application layer,
+        // where we validate the model with fluent validation
+        services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true;
+        });
+
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
