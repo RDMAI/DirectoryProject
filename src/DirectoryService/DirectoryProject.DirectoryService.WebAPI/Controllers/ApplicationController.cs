@@ -1,7 +1,7 @@
 ﻿using DirectoryProject.DirectoryService.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DirectoryProject.DirectoryService.WebAPI;
+namespace DirectoryProject.DirectoryService.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

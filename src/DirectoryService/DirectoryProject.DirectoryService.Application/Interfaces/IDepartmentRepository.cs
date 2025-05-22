@@ -18,6 +18,10 @@ public interface IDepartmentRepository
         Id<Department> id,
         CancellationToken cancellationToken = default);
 
+    Task<UnitResult> IsPathUniqueAsync(
+        string path,
+        CancellationToken cancellationToken = default);
+
     Task<UnitResult> AreLocationsValidAsync(
         IEnumerable<Id<Location>> locationIds,
         CancellationToken cancellationToken = default);

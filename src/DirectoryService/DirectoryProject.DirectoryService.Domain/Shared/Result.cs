@@ -4,7 +4,7 @@ namespace DirectoryProject.DirectoryService.Domain.Shared;
 
 public record Result<TValue>
 {
-    public bool IsSuccess { get; }
+    public bool IsSuccess { get; private set; } = false;
     public bool IsFailure => !IsSuccess;
 
     public TValue Value { get; }
@@ -12,10 +12,10 @@ public record Result<TValue>
     public List<Error> Errors { get; } = [];
 
     public static Result<TValue> Success(TValue value)
-        => new Result<TValue>(value: value, errors: []);
+        => new Result<TValue>(isSuccess: true, value: value, errors: []);
 
     public static Result<TValue> Error(List<Error> errors)
-        => new Result<TValue>(value: default, errors: errors);
+        => new Result<TValue>(isSuccess: false, value: default, errors: errors);
 
     public static implicit operator Result<TValue>(TValue value) => Result<TValue>.Success(value);
     public static implicit operator Result<TValue>(List<Error> errors) => Result<TValue>.Error(errors);
@@ -34,8 +34,9 @@ public record Result<TValue>
         return sb.ToString();
     }
 
-    private Result(TValue value, List<Error> errors)
+    private Result(bool isSuccess, TValue value, List<Error> errors)
     {
+        IsSuccess = isSuccess;
         Value = value;
         Errors = errors;
     }
@@ -43,13 +44,13 @@ public record Result<TValue>
 
 public record UnitResult
 {
-    public bool IsSuccess { get; }
+    public bool IsSuccess { get; private set; } = false;
     public bool IsFailure => !IsSuccess;
 
     public List<Error> Errors { get; }
 
-    public static UnitResult Success() => new UnitResult([]);
-    public static UnitResult Error(List<Error> errors) => new UnitResult(errors);
+    public static UnitResult Success() => new(true, []);
+    public static UnitResult Error(List<Error> errors) => new(false, errors);
 
     public static implicit operator UnitResult(List<Error> errors) => Error(errors);
     public static implicit operator UnitResult(Error error) => Error([error]);
@@ -67,8 +68,9 @@ public record UnitResult
         return sb.ToString();
     }
 
-    private UnitResult(List<Error> errors)
+    private UnitResult(bool isSuccess, List<Error> errors)
     {
+        IsSuccess = isSuccess;
         Errors = errors;
     }
 }

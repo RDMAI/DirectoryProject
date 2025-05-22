@@ -1,4 +1,5 @@
-﻿using DirectoryProject.DirectoryService.Application.Interfaces;
+﻿using System.Text;
+using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Application.Shared.Services;
@@ -56,20 +57,8 @@ public class CreateDepartmentHandler
             return areLocationsValidResult.Errors;
 
         Id<Department>? parentId = null;
-        Result<Department> entityResult;
         Department? parent = null;
-        if (command.ParentId is null)
-        {
-            // create entity without parent
-            entityResult = Department.Create(
-                id: Id<Department>.GenerateNew(),
-                name: DepartmentName.Create(command.Name).Value,
-                path: $"{_slugService.ConvertStringToSlug(command.Name)}",
-                depth: 0,
-                childrenCount: 0,
-                createdAt: DateTime.UtcNow);
-        }
-        else // if command.ParentId is not null
+        if (command.ParentId is not null)
         {
             // validate parent
             parentId = Id<Department>.Create(command.ParentId.Value);
@@ -80,16 +69,28 @@ public class CreateDepartmentHandler
                 return parentResult.Errors;
 
             parent = parentResult.Value;
-
-            // create entity with parent
-            entityResult = Department.Create(
-                id: Id<Department>.GenerateNew(),
-                name: DepartmentName.Create(command.Name).Value,
-                path: $"{parentResult.Value.Path}.{_slugService.ConvertStringToSlug(command.Name)}",
-                depth: (short)(parentResult.Value.Depth + 1),
-                childrenCount: 0,
-                createdAt: DateTime.UtcNow);
         }
+
+        string path = parent is null ?
+            _slugService.ConvertStringToSlug(command.Name) :
+            $"{parent.Path}.{_slugService.ConvertStringToSlug(command.Name)}";
+
+        var isPathUnique = await _departmentRepository.IsPathUniqueAsync(
+            path,
+            cancellationToken);
+        if (isPathUnique.IsFailure)
+            return isPathUnique.Errors;
+
+        var entityResult = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create(command.Name).Value,
+            parentId: parentId,
+            path: path,
+            depth: parent is null ?
+                (short)0 :
+                (short)(parent.Depth + 1),
+            childrenCount: 0,
+            createdAt: DateTime.UtcNow);
 
         if (entityResult.IsFailure)
             return entityResult.Errors;

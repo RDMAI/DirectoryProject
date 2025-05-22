@@ -26,9 +26,20 @@ public class DepartmentRepository : IDepartmentRepository
 
         foreach (var id in existingIds)
         {
-            if (locationIds.Contains(id) == false)
+            if (locationIds.FirstOrDefault(id) is null)
                 return ErrorHelper.General.NotFound(id.Value);
         }
+
+        return UnitResult.Success();
+    }
+
+    public async Task<UnitResult> IsPathUniqueAsync(
+        string path,
+        CancellationToken cancellationToken = default)
+    {
+        var entity = await _context.Departments.FirstOrDefaultAsync(d => d.Path == path);
+        if (entity is not null)
+            return ErrorHelper.General.AlreadyExist(path);
 
         return UnitResult.Success();
     }

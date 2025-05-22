@@ -24,6 +24,7 @@ public class Department
     public static Result<Department> Create(
         Id<Department> id,
         DepartmentName name,
+        Id<Department> parentId,
         string path,
         short depth,
         int childrenCount,
@@ -41,6 +42,7 @@ public class Department
         return new Department(
             id,
             name,
+            parentId,
             path,
             depth,
             childrenCount,
@@ -69,6 +71,7 @@ public class Department
     private Department(
         Id<Department> id,
         DepartmentName name,
+        Id<Department> parentId,
         string path,
         short depth,
         int childrenCount,
@@ -76,6 +79,7 @@ public class Department
     {
         Id = id;
         Name = name;
+        ParentId = parentId;
         Path = path;
         Depth = depth;
         ChildrenCount = childrenCount;
