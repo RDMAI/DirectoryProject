@@ -4,7 +4,7 @@ using System.Data;
 namespace DirectoryProject.DirectoryService.Infrastructure.Database;
 public class DirectoryServiceUnitOfWork : IUnitOfWork
 {
-    public async Task<IDbTransaction> BeginTransaction(CancellationToken cancellationToken = default)
+    public async Task<IDbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
 
     }

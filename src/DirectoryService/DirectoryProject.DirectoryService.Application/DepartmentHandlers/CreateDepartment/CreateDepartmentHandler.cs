@@ -18,17 +18,20 @@ public class CreateDepartmentHandler
     private readonly ILogger<CreateDepartmentHandler> _logger;
     private readonly IDepartmentRepository _departmentRepository;
     private readonly SlugService _slugService;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateDepartmentHandler(
         AbstractValidator<CreateDepartmentCommand> validator,
         ILogger<CreateDepartmentHandler> logger,
         IDepartmentRepository departmentRepository,
-        SlugService slugService)
+        SlugService slugService,
+        IUnitOfWork unitOfWork)
     {
         _validator = validator;
         _logger = logger;
         _departmentRepository = departmentRepository;
         _slugService = slugService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<DepartmentDTO>> HandleAsync(
@@ -53,7 +56,20 @@ public class CreateDepartmentHandler
             return areLocationsValidResult.Errors;
 
         Id<Department>? parentId = null;
-        if (command.ParentId is not null)
+        Result<Department> entityResult;
+        Department? parent = null;
+        if (command.ParentId is null)
+        {
+            // create entity without parent
+            entityResult = Department.Create(
+                id: Id<Department>.GenerateNew(),
+                name: DepartmentName.Create(command.Name).Value,
+                path: $"{_slugService.ConvertStringToSlug(command.Name)}",
+                depth: 0,
+                childrenCount: 0,
+                createdAt: DateTime.UtcNow);
+        }
+        else // if command.ParentId is not null
         {
             // validate parent
             parentId = Id<Department>.Create(command.ParentId.Value);
@@ -63,33 +79,46 @@ public class CreateDepartmentHandler
             if (parentResult.IsFailure)
                 return parentResult.Errors;
 
-            var entityResult = Department.Create(
+            parent = parentResult.Value;
+
+            // create entity with parent
+            entityResult = Department.Create(
                 id: Id<Department>.GenerateNew(),
                 name: DepartmentName.Create(command.Name).Value,
                 path: $"{parentResult.Value.Path}.{_slugService.ConvertStringToSlug(command.Name)}",
                 depth: (short)(parentResult.Value.Depth + 1),
                 childrenCount: 0,
                 createdAt: DateTime.UtcNow);
-
-            if (entityResult.IsFailure)
-                return entityResult.Errors;
-
-            
         }
-        
-        //Формирование Path
 
-        //    slug = kebab‑case(name) → dev-team, finansovyj-otdel, …
-        //    Path = parent.Path + '.' + slug или slug для корня.
-        //    Depth = parent.Depth + 1 (или 0 для корня).
-        //    ChildrenCount = 0.
+        if (entityResult.IsFailure)
+            return entityResult.Errors;
+        var entity = entityResult.Value;
 
-        //Транзакция
+        var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        //    Вставить запись в Department.
-        //    Вставить строки в DepartmentLocation для всех locationIds.
-        //    Обновить ChildrenCount у родителя (если он есть).
+        entity.AddLocations(locationIds);
 
-        //Ответ — 201 Created + DTO созданного отдела.
+        var createResult = await _departmentRepository.CreateAsync(entity, cancellationToken);
+        if (createResult.IsFailure)
+        {
+            transaction.Rollback();
+            return createResult.Errors;
+        }
+
+        if (parent is not null)
+        {
+            parent.IncreaseChildrenCount();
+            var updateParentResult = await _departmentRepository.UpdateAsync(parent, cancellationToken);
+            if (updateParentResult.IsFailure)
+            {
+                transaction.Rollback();
+                return updateParentResult.Errors;
+            }
+        }
+
+        transaction.Commit();
+
+        return DepartmentDTO.FromDomainEntity(entity);
     }
 }

@@ -53,6 +53,16 @@ public class Department
         return this;
     }
 
+    public Department AddLocations(IEnumerable<Id<Location>> locationIds)
+    {
+        var locationDepartments = locationIds.Select(l =>
+            new DepartmentLocation(
+                departmentId: Id,
+                locationId: l));
+        _departmentLocations.AddRange(locationDepartments);
+        return this;
+    }
+
     // EF Core
     private Department() { }
 
