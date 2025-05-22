@@ -26,6 +26,13 @@ public class Position
             createdAt);
     }
 
+    public Position Update()
+    {
+
+
+        return this;
+    }
+
     // EF Core
     private Position() { }
 
