@@ -2,7 +2,6 @@
 using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
-using DirectoryProject.DirectoryService.Application.Shared.Services;
 using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
@@ -18,20 +17,20 @@ public class CreateDepartmentHandler
     private readonly AbstractValidator<CreateDepartmentCommand> _validator;
     private readonly ILogger<CreateDepartmentHandler> _logger;
     private readonly IDepartmentRepository _departmentRepository;
-    private readonly SlugService _slugService;
+    private readonly ILocationRepository _locationRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateDepartmentHandler(
         AbstractValidator<CreateDepartmentCommand> validator,
         ILogger<CreateDepartmentHandler> logger,
         IDepartmentRepository departmentRepository,
-        SlugService slugService,
+        ILocationRepository locationRepository,
         IUnitOfWork unitOfWork)
     {
         _validator = validator;
         _logger = logger;
         _departmentRepository = departmentRepository;
-        _slugService = slugService;
+        _locationRepository = locationRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -50,7 +49,7 @@ public class CreateDepartmentHandler
 
         // validate locations
         var locationIds = command.LocationIds.Select(Id<Location>.Create);
-        var areLocationsValidResult = await _departmentRepository.AreLocationsValidAsync(
+        var areLocationsValidResult = await _locationRepository.AreLocationsValidAsync(
             locationIds,
             cancellationToken);
         if (areLocationsValidResult.IsFailure)
@@ -71,9 +70,7 @@ public class CreateDepartmentHandler
             parent = parentResult.Value;
         }
 
-        string path = parent is null ?
-            _slugService.ConvertStringToSlug(command.Name) :
-            $"{parent.Path}.{_slugService.ConvertStringToSlug(command.Name)}";
+        var path = DepartmentPath.CreateFromStringAndParent(command.Name, parent?.Path.Value);
 
         var isPathUnique = await _departmentRepository.IsPathUniqueAsync(
             path,
@@ -119,6 +116,11 @@ public class CreateDepartmentHandler
         }
 
         transaction.Commit();
+
+        _logger.LogInformation(
+            "Department created with id {0} name {1}",
+            entity.Name.Value,
+            entity.Id.Value);
 
         return DepartmentDTO.FromDomainEntity(entity);
     }

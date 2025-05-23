@@ -64,6 +64,11 @@ public class CreateLocationHandler
         if (result.IsFailure)
             return result.Errors;
 
+        _logger.LogInformation(
+            "Location created with id {0} name {1}",
+            result.Value.Name.Value,
+            result.Value.Id.Value);
+
         return LocationDTO.FromDomainEntity(result.Value);
     }
 }

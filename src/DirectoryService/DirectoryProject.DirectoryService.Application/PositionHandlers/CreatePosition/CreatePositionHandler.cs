@@ -56,6 +56,11 @@ public class CreatePositionHandler
         if (result.IsFailure)
             return result.Errors;
 
+        _logger.LogInformation(
+            "Position created with id {0} name {1}",
+            result.Value.Name.Value,
+            result.Value.Id.Value);
+
         return PositionDTO.FromDomainEntity(result.Value);
     }
 }

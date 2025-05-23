@@ -26,4 +26,8 @@ public interface ILocationRepository
     Task<UnitResult> IsNameUniqueAsync(
         LocationName name,
         CancellationToken cancellationToken = default);
+
+    Task<UnitResult> AreLocationsValidAsync(
+        IEnumerable<Id<Location>> locationIds,
+        CancellationToken cancellationToken = default);
 }

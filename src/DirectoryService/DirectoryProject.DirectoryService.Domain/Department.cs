@@ -1,7 +1,6 @@
 ﻿using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryProject.DirectoryService.Domain;
 
@@ -11,7 +10,7 @@ public class Department
     public DepartmentName Name { get; }
     public Id<Department>? ParentId { get; }
     public Department? Parent { get; }
-    public LTree Path { get; }
+    public DepartmentPath Path { get; }
     public short Depth { get; }
     public int ChildrenCount { get; private set; }
     public bool IsActive { get; } = true;
@@ -24,15 +23,12 @@ public class Department
     public static Result<Department> Create(
         Id<Department> id,
         DepartmentName name,
-        Id<Department> parentId,
-        string path,
+        Id<Department>? parentId,
+        DepartmentPath path,
         short depth,
         int childrenCount,
         DateTime createdAt)
     {
-        if (string.IsNullOrEmpty(path))
-            return ErrorHelper.General.ValueIsInvalid(nameof(Path));
-
         if (childrenCount < 0)
             return ErrorHelper.General.ValueIsInvalid(nameof(ChildrenCount));
 
@@ -71,8 +67,8 @@ public class Department
     private Department(
         Id<Department> id,
         DepartmentName name,
-        Id<Department> parentId,
-        string path,
+        Id<Department>? parentId,
+        DepartmentPath path,
         short depth,
         int childrenCount,
         DateTime createdAt)
