@@ -26,4 +26,10 @@
     <ProjectReference Include="..\DirectoryProject.DirectoryService.Infrastructure\DirectoryProject.DirectoryService.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="etc\slugReplaceDictionary.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

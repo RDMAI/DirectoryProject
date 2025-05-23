@@ -1,7 +1,6 @@
 ﻿using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryProject.DirectoryService.Domain;
 
@@ -11,9 +10,9 @@ public class Department
     public DepartmentName Name { get; }
     public Id<Department>? ParentId { get; }
     public Department? Parent { get; }
-    public LTree Path { get; }
+    public DepartmentPath Path { get; }
     public short Depth { get; }
-    public int ChildrenCount { get; }
+    public int ChildrenCount { get; private set; }
     public bool IsActive { get; } = true;
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; }
@@ -24,14 +23,12 @@ public class Department
     public static Result<Department> Create(
         Id<Department> id,
         DepartmentName name,
-        string path,
+        Id<Department>? parentId,
+        DepartmentPath path,
         short depth,
         int childrenCount,
         DateTime createdAt)
     {
-        if (string.IsNullOrEmpty(path))
-            return ErrorHelper.General.ValueIsInvalid(nameof(Path));
-
         if (childrenCount < 0)
             return ErrorHelper.General.ValueIsInvalid(nameof(ChildrenCount));
 
@@ -41,10 +38,27 @@ public class Department
         return new Department(
             id,
             name,
+            parentId,
             path,
             depth,
             childrenCount,
             createdAt);
+    }
+
+    public Department IncreaseChildrenCount()
+    {
+        ChildrenCount++;
+        return this;
+    }
+
+    public Department AddLocations(IEnumerable<Id<Location>> locationIds)
+    {
+        var locationDepartments = locationIds.Select(l =>
+            new DepartmentLocation(
+                departmentId: Id,
+                locationId: l));
+        _departmentLocations.AddRange(locationDepartments);
+        return this;
     }
 
     // EF Core
@@ -53,13 +67,15 @@ public class Department
     private Department(
         Id<Department> id,
         DepartmentName name,
-        string path,
+        Id<Department>? parentId,
+        DepartmentPath path,
         short depth,
         int childrenCount,
         DateTime createdAt)
     {
         Id = id;
         Name = name;
+        ParentId = parentId;
         Path = path;
         Depth = depth;
         ChildrenCount = childrenCount;

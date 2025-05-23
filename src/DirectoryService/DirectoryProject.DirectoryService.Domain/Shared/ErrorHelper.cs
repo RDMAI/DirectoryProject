@@ -31,10 +31,18 @@ public static class ErrorHelper
             return Error.Validation("record.not.found", $"record not found{label}");
         }
 
+        public static Error NotFound(string? message = null)
+        {
+            if (message is null)
+                return Error.Validation("record.not.found", $"record not found");
+
+            return Error.Validation("record.not.found", message);
+        }
+
         public static Error AlreadyExist(string? name = null)
         {
             var label = name ?? DEFAULT_LABEL_VALUE;
-            return Error.Validation("record.exists", $"{label} exists");
+            return Error.Conflict("record.exists", $"{label} exists");
         }
     }
 }

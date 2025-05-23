@@ -1,7 +1,11 @@
-﻿namespace DirectoryProject.DirectoryService.Domain.Shared;
+﻿using System.Text;
+
+namespace DirectoryProject.DirectoryService.Domain.Shared;
 
 public record Error
 {
+    public const string SEPARATOR = "||";
+
     public static Error Validation(string code, string message, string? invalidField = null) =>
         new(code, message, ErrorType.Validation, invalidField);
     public static Error NotFound(string code, string message) =>
@@ -17,6 +21,29 @@ public record Error
     public string Message { get; }
     public ErrorType Type { get; }
     public string? InvalidField { get; }
+
+    public string Serialize()
+    {
+        var sb = new StringBuilder($"{Code}{SEPARATOR}{Message}{SEPARATOR}{Type}");
+        sb.Append(InvalidField is null ? string.Empty : $"{SEPARATOR}{InvalidField}");
+        return sb.ToString();
+    }
+
+    public static Error Deserialize(string serialized)
+    {
+        var strings = serialized.Split(SEPARATOR);
+
+        if (strings.Length < 3)
+            throw new ArgumentException("Invalid serialized error format");
+
+        if (Enum.TryParse<ErrorType>(strings[2], out var type) == false)
+            throw new ArgumentException("Invalid serialized error format");
+
+        if (strings.Length == 4)  // case where error has invalid field name
+            return new Error(strings[0], strings[1], type, strings[3]);
+
+        return new Error(strings[0], strings[1], type);
+    }
 
     // for debugging
     public override string ToString() => $"Type: {Type}. {Code}: {Message}";

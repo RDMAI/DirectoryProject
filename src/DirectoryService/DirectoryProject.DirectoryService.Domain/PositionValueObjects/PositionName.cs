@@ -14,7 +14,7 @@ public class PositionName
         if (string.IsNullOrWhiteSpace(value))
             return ErrorHelper.General.ValueIsNullOrEmpty(nameof(PositionName));
 
-        if (value.Length < MIN_LENGTH || value.Length > MAX_LENGTH)
+        if (MIN_LENGTH > value.Length || value.Length > MAX_LENGTH)
             return ErrorHelper.General.ValueIsInvalid(nameof(PositionName));
 
         return new PositionName(value);
