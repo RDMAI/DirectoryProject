@@ -9,9 +9,6 @@ public class DepartmentLocation
     public Id<Location> LocationId { get; }
     public Location Location { get; }
 
-    // EF Core
-    private DepartmentLocation() {}
-
     public DepartmentLocation(
         Id<Department> departmentId,
         Id<Location> locationId)
@@ -19,4 +16,7 @@ public class DepartmentLocation
         DepartmentId = departmentId;
         LocationId = locationId;
     }
+
+    // EF Core
+    private DepartmentLocation() {}
 }
