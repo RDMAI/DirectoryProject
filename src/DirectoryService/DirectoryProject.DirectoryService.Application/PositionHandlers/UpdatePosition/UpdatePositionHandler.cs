@@ -2,7 +2,6 @@
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
-using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 using DirectoryProject.DirectoryService.Domain.PositionValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
@@ -62,16 +61,12 @@ public class UpdatePositionHandler
 
         entity.Update(
             name: name,
-            address: LocationAddress.Create(
-        city: command.Address.City,
-                street: command.Address.Street,
-                houseNumber: command.Address.HouseNumber).Value,
-            timeZone: IANATimeZone.Create(command.TimeZone).Value);
+            description: PositionDescription.Create(command.Description).Value);
 
-        var updateResult = await _locationRepository.UpdateAsync(entity, cancellationToken);
+        var updateResult = await _positionRepository.UpdateAsync(entity, cancellationToken);
         if (updateResult.IsFailure)
             return updateResult.Errors;
 
-        return LocationDTO.FromDomainEntity(entity);
+        return PositionDTO.FromDomainEntity(entity);
     }
 }
