@@ -1,5 +1,4 @@
-﻿using System.Text;
-using DirectoryProject.DirectoryService.Application.Interfaces;
+﻿using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
@@ -62,40 +61,39 @@ public class CreateDepartmentHandler
             // validate parent
             parentId = Id<Department>.Create(command.ParentId.Value);
             var parentResult = await _departmentRepository.GetByIdAsync(
-                parentId,
-                cancellationToken);
+                id: parentId,
+                cancellationToken: cancellationToken);
             if (parentResult.IsFailure)
                 return parentResult.Errors;
 
             parent = parentResult.Value;
         }
 
-        var path = DepartmentPath.CreateFromStringAndParent(command.Name, parent?.Path.Value);
+        var name = DepartmentName.Create(command.Name).Value;
+
+        var pathResult = Department.CreatePath(name, parent?.Path);
+        if (pathResult.IsFailure)
+            return pathResult.Errors;
 
         var isPathUnique = await _departmentRepository.IsPathUniqueAsync(
-            path,
+            pathResult.Value,
             cancellationToken);
         if (isPathUnique.IsFailure)
             return isPathUnique.Errors;
 
         var entityResult = Department.Create(
             id: Id<Department>.GenerateNew(),
-            name: DepartmentName.Create(command.Name).Value,
-            parentId: parentId,
-            path: path,
-            depth: parent is null ?
-                (short)0 :
-                (short)(parent.Depth + 1),
-            childrenCount: 0,
+            name: name,
+            parent: parent,
             createdAt: DateTime.UtcNow);
-
         if (entityResult.IsFailure)
             return entityResult.Errors;
+
         var entity = entityResult.Value;
 
         var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-        entity.AddLocations(locationIds);
+        entity.UpdateLocations(locationIds);
 
         var createResult = await _departmentRepository.CreateAsync(entity, cancellationToken);
         if (createResult.IsFailure)

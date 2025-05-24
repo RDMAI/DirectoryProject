@@ -2,6 +2,7 @@
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryProject.DirectoryService.Application.Interfaces;
 
@@ -17,9 +18,14 @@ public interface IDepartmentRepository
 
     Task<Result<Department>> GetByIdAsync(
         Id<Department> id,
+        bool loadFullBranch = false,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<IEnumerable<Department>>> GetFlatTreeAsync(
+        LTree path,
         CancellationToken cancellationToken = default);
 
     Task<UnitResult> IsPathUniqueAsync(
-        DepartmentPath path,
+        LTree path,
         CancellationToken cancellationToken = default);
 }

@@ -17,14 +17,25 @@ public class DepartmentRepository : IDepartmentRepository
     }
 
     public async Task<UnitResult> IsPathUniqueAsync(
-        DepartmentPath path,
+        LTree path,
         CancellationToken cancellationToken = default)
     {
         var entity = await _context.Departments.FirstOrDefaultAsync(d => d.Path == path);
         if (entity is not null)
-            return ErrorHelper.General.AlreadyExist(path.Value);
+            return ErrorHelper.General.AlreadyExist(path);
 
         return UnitResult.Success();
+    }
+
+    public async Task<Result<IEnumerable<Department>>> GetFlatTreeAsync(
+        LTree path,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _context.Departments
+            .Where(d => d.Path.IsAncestorOf(path)) // also returns itself
+            .ToListAsync(cancellationToken);
+
+        return result;
     }
 
     public async Task<Result<Department>> CreateAsync(
@@ -39,9 +50,14 @@ public class DepartmentRepository : IDepartmentRepository
 
     public async Task<Result<Department>> GetByIdAsync(
         Id<Department> id,
+        bool loadFullBranch,
         CancellationToken cancellationToken = default)
     {
-        var entity = await _context.Departments.FirstOrDefaultAsync(d => d.Id == id);
+        IQueryable<Department> set = _context.Departments;
+        if (loadFullBranch)
+            set = set.Include(d => d.Parent);
+
+        var entity = await set.FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
         if (entity is null)
             return ErrorHelper.General.NotFound(id.Value);
 

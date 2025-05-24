@@ -43,14 +43,12 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .OnDelete(DeleteBehavior.Restrict);  // restricts deletion of parent if it has any children
 
         builder.Property(d => d.Path)
-            .HasConversion(
-                valueObject => valueObject.Value,
-                treeFromDataBase => DepartmentPath.CreateFromExisting(treeFromDataBase))
             .IsRequired()
             .HasColumnName("path");
 
         builder.HasIndex(d => d.Path)
-            .IsUnique();
+            .IsUnique()
+            .HasMethod("gist");  // to use ltree's operators
 
         builder.Property(d => d.Depth)
             .IsRequired()

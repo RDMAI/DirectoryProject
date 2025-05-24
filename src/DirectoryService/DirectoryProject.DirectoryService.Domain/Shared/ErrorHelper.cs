@@ -45,4 +45,12 @@ public static class ErrorHelper
             return Error.Conflict("record.exists", $"{label} exists");
         }
     }
+
+    public static class Tree
+    {
+        public static Error CycleInTree(Guid entityId)
+        {
+            return Error.Conflict("value.is.invalid", $"Adding entity with id {entityId} creates cycle in entity's tree");
+        }
+    }
 }
