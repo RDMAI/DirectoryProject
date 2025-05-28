@@ -23,6 +23,8 @@ public class Department
     private IEnumerable<DepartmentLocation> _departmentLocations = [];
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
 
+    public List<Department> ChildrenDepartments { get; set; } = []; // test to make ef core properly include Parent
+
     public static Result<Department> Create(
         Id<Department> id,
         DepartmentName name,
@@ -43,7 +45,7 @@ public class Department
             createdAt: createdAt);
     }
 
-    public Result<Department> Update(
+    public Department Update(
         DepartmentName name,
         Id<Department>? parentId,
         string path)
@@ -51,6 +53,7 @@ public class Department
         Name = name;
         ParentId = parentId;
         Path = path;
+        Depth = (short)Path.NLevel;
 
         return this;
     }

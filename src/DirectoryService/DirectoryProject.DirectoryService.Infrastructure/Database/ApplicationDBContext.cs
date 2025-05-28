@@ -22,7 +22,8 @@ public class ApplicationDBContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseNpgsql(_connectionString);
-        optionsBuilder.LogTo(Console.WriteLine);
+        optionsBuilder.LogTo(Console.WriteLine)
+            .EnableSensitiveDataLogging();
         optionsBuilder.UseSnakeCaseNamingConvention();
 
         base.OnConfiguring(optionsBuilder);

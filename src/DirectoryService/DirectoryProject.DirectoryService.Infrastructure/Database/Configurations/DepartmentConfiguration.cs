@@ -23,7 +23,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.Property(d => d.IsActive)
             .IsRequired()
             .HasColumnName("is_active");
-        builder.HasQueryFilter(d => d.IsActive);  // global query filter
+        //builder.HasQueryFilter(d => d.IsActive);  // global query filter
 
         builder.Property(d => d.Name)
             .HasConversion(
@@ -34,11 +34,14 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnName("name");
 
         builder.Property(d => d.ParentId)
+            .HasConversion(
+                id => id != null ? id.Value : (Guid?)null,
+                value => value.HasValue ? Id<Department>.Create(value.Value) : null)
             .IsRequired(false)
             .HasColumnName("parent_id");
 
         builder.HasOne(d => d.Parent)
-            .WithMany()
+            .WithMany(d => d.ChildrenDepartments)
             .HasForeignKey(d => d.ParentId)
             .OnDelete(DeleteBehavior.Restrict);  // restricts deletion of parent if it has any children
 

@@ -14,9 +14,9 @@ public class DepartmentLocationConfiguration : IEntityTypeConfiguration<Departme
         builder.HasKey(d => new { d.DepartmentId, d.LocationId });
 
         builder.Property(d => d.DepartmentId)
-            .HasConversion(
-                id => id.Value,
-                value => Id<Department>.Create(value))
+            //.HasConversion(
+            //    id => id.Value,
+            //    value => Id<Department>.Create(value))
             .HasColumnName("department_id");
 
         builder.Property(d => d.LocationId)

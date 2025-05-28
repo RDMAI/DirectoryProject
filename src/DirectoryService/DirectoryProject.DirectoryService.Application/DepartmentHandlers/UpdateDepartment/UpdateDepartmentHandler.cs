@@ -2,9 +2,11 @@
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
+using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
@@ -54,40 +56,68 @@ public class UpdateDepartmentHandler
 
         var entity = entityResult.Value;
 
-        // validate parent
-        var newParentId = command.ParentId is null ? null : Id<Department>.Create(command.ParentId!.Value);
-        Department? parent = entity.Parent;
-        if (entity.ParentId != newParentId && newParentId is not null)
-        {
-            var parentResult = await _departmentRepository.GetByIdAsync(
-                id: newParentId,
-                loadFullBranch: true,
-                cancellationToken: cancellationToken);
-            if (parentResult.IsFailure)
-                return parentResult.Errors;
+        //var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            parent = parentResult.Value;
-        }
+        //// Get parent
+        //var oldParentId = entity.ParentId;
+        //var updatedParentId = command.ParentId is null ? null : Id<Department>.Create(command.ParentId!.Value);
+        //if (entity.ParentId == updatedParentId)
+        //    updatedParentId = entity.ParentId;
+        //Department? parent = null;
+        //if (updatedParentId is not null)
+        //{
+        //    var parentResult = await _departmentRepository.GetByIdAsync(
+        //        id: updatedParentId,
+        //        cancellationToken: cancellationToken);
+        //    if (parentResult.IsFailure)
+        //        return parentResult.Errors;
 
-        // check if tree already contains entity's id
-        if (parent is not null)
-        {
-            var parentFlatTreeResult = await _departmentRepository.GetFlatTreeAsync(parent.Path, cancellationToken);
-            if (parentFlatTreeResult.IsFailure)
-                return parentFlatTreeResult.Errors;
+        //    parent = parentResult.Value;
+        //}
 
-            if (parentFlatTreeResult.Value.FirstOrDefault(d => d.Id == entity.Id) is not null)
-                return ErrorHelper.Tree.CycleInTree(entity.Id.Value);
-        }
+        //// validate new path
+        //var updatedName = DepartmentName.Create(command.Name).Value;
+        //Result<LTree> updatedPathResult;
+        //if (entity.Name != updatedName)
+        //{
+        //    updatedPathResult = Department.CreatePath(updatedName, parent?.Path);
+        //}
+        //else
+        //{
+        //    updatedPathResult = Department.CreatePath(entity.Name, parent?.Path);
+        //    updatedName = entity.Name;
+        //}
 
-        // validate locations
-        var locationIds = command.LocationIds.Select(Id<Location>.Create);
-        var areLocationsValidResult = await _locationRepository.AreLocationsValidAsync(
-            locationIds,
-            cancellationToken);
-        if (areLocationsValidResult.IsFailure)
-            return areLocationsValidResult.Errors;
+        //if (updatedPathResult.IsFailure)
+        //    return updatedPathResult.Errors;
 
+        //// check if tree already contains entity's id
+        //if (parent is not null)
+        //{
+        //    var parentFlatTreeResult = await _departmentRepository.GetFlatTreeAsync(parent.Path, cancellationToken);
+        //    if (parentFlatTreeResult.IsFailure)
+        //        return parentFlatTreeResult.Errors;
+
+        //    if (parentFlatTreeResult.Value.FirstOrDefault(d => d.Id == entity.Id) is not null)
+        //        return ErrorHelper.Tree.CycleInTree(entity.Id.Value);
+        //}
+
+        //// validate locations
+        //var locationIds = command.LocationIds.Select(Id<Location>.Create);
+        //var areLocationsValidResult = await _locationRepository.AreLocationsValidAsync(
+        //    locationIds,
+        //    cancellationToken);
+        //if (areLocationsValidResult.IsFailure)
+        //    return areLocationsValidResult.Errors;
+
+        //entity.Update(updatedName, updatedParentId, updatedPathResult.Value)
+        //    .UpdateLocations(locationIds);
+
+        //parent?.IncreaseChildrenCount();
+
+        //Транзакция:
+        //    обновить отдел +поддерево + счётчики.
+        //200 OK(Envelope.Success).
 
 
 

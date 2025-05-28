@@ -18,11 +18,15 @@ public interface IDepartmentRepository
 
     Task<Result<Department>> GetByIdAsync(
         Id<Department> id,
-        bool loadFullBranch = false,
         CancellationToken cancellationToken = default);
 
     Task<Result<IEnumerable<Department>>> GetFlatTreeAsync(
         LTree path,
+        CancellationToken cancellationToken = default);
+
+    Task<UnitResult> UpdateChildrenPathAsync(
+        LTree oldPath,
+        LTree newPath,
         CancellationToken cancellationToken = default);
 
     Task<UnitResult> IsPathUniqueAsync(
