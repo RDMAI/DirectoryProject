@@ -14,7 +14,8 @@ public interface IDepartmentRepository
 
     Task<Result<Department>> UpdateAsync(
         Department entity,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        IEnumerable<DepartmentLocation>? oldDepartmentLocations = null);
 
     Task<Result<Department>> GetByIdAsync(
         Id<Department> id,

@@ -66,6 +66,12 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
+                    b.Property<uint>("version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id")
                         .HasName("pk_departments");
 
@@ -75,6 +81,8 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                     b.HasIndex("Path")
                         .IsUnique()
                         .HasDatabaseName("ix_departments_path");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
 
                     b.ToTable("departments", "diretory_service");
                 });
@@ -128,8 +136,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 
                             b1.Property<string>("Value")
                                 .IsRequired()
-                                .HasMaxLength(30)
-                                .HasColumnType("character varying(30)")
+                                .HasColumnType("text")
                                 .HasColumnName("time_zone");
                         });
 

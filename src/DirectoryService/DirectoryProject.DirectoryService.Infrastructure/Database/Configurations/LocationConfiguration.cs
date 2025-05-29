@@ -70,10 +70,18 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
                 .HasColumnName("time_zone");
         });
 
+        builder.Navigation(nameof(Location.DepartmentLocations))
+            .HasField("_departmentLocations");
+
         builder.HasMany(l => l.DepartmentLocations)
             .WithOne(dl => dl.Location)
             .HasForeignKey(dl => dl.LocationId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        //builder.HasMany("_departmentLocations")
+        //    .WithOne(nameof(DepartmentLocation.Location))
+        //    .HasForeignKey(nameof(DepartmentLocation.LocationId))
+        //    .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(d => d.CreatedAt)
             .HasConversion(

@@ -16,8 +16,14 @@ public class ApplicationDBContext : DbContext
     }
 
     public DbSet<Department> Departments { get; set; }
+    public DbSet<DepartmentLocation> DepartmentLocations { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<Position> Positions { get; set; }
+
+    public async Task ApplyMigrationsAsync()
+    {
+        await Database.MigrateAsync();
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

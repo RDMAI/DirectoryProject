@@ -2,8 +2,10 @@
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Infrastructure.Database;
 using DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace DirectoryProject.DirectoryService.Infrastructure;
 

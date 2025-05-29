@@ -45,20 +45,35 @@ public class DepartmentRepository : IDepartmentRepository
         LTree newPath,
         CancellationToken cancellationToken = default)
     {
-        // Intention:
-        // UPDATE item
-        // SET path = NEW.path || subpath(path, nlevel(OLD.path))
-        // WHERE path<@ OLD.path;
-        await _context.Departments
-            .Where(d => d.IsActive)
-            .Where(d => d.Path.IsDescendantOf(oldPath))
-            .ExecuteUpdateAsync(
-                propCall => propCall.SetProperty(
-                d => d.Path,
-                d => (LTree)(newPath + d.Path.Subpath(d.Path.NLevel))),
-                cancellationToken);
+        try
+        {
+            var oldDepth = Department.CalculateDepth(oldPath);
+            var newDepth = Department.CalculateDepth(newPath);
 
-        return UnitResult.Success();
+            // Intention:
+            // UPDATE item
+            // SET path = NEW.path || subpath(path, nlevel(OLD.path))
+            // WHERE path<@ OLD.path;
+            await _context.Departments
+                .Where(d => d.IsActive)
+                .Where(d => d.Path.IsDescendantOf(oldPath))
+                .Where(d => d.Path != newPath)
+                .ExecuteUpdateAsync(
+                    propCall => propCall
+                    .SetProperty(
+                        d => d.Path,
+                        d => (LTree)(newPath + "." + d.Path.Subpath(oldDepth + 1)))
+                    .SetProperty(
+                        d => d.Depth,
+                        d => d.Path.NLevel - 1 - oldDepth + newDepth),  // d.Path.NLevel - 1 won't work, because it will not be updated yet
+                    cancellationToken);
+
+            return UnitResult.Success();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return ErrorHelper.Tree.ConcurrentUpdateFailed(oldPath);
+        }
     }
 
     public async Task<Result<Department>> CreateAsync(
@@ -77,30 +92,53 @@ public class DepartmentRepository : IDepartmentRepository
     {
         var entity = await _context.Departments
             .Include(d => d.Parent)
-            .Where(d => d.Id == id)
-            .Select(d => new {
-                Department = d,
-                Parent = d.Parent,
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            .Include(d => d.DepartmentLocations)
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
 
-        throw new NotImplementedException();
-        //var entity = await _context.Departments
-        //    .Include(d => d.Parent).FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
-        //if (entity is null)
-        //    return ErrorHelper.General.NotFound(id.Value);
+        if (entity is null)
+            return ErrorHelper.General.NotFound(id.Value);
 
-        //return entity;
+        return entity;
     }
 
     public async Task<Result<Department>> UpdateAsync(
         Department entity,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IEnumerable<DepartmentLocation>? oldDepartmentLocations = null)
     {
-        // Not needed because entity is tracked by EF Core,
-        // and it wil auto update it when SaveChanges is called
-        // var entry = _context.Departments.Update(entity);
-        await _context.SaveChangesAsync(cancellationToken);
-        return entity;
+        try
+        {
+            // sync DepartmentLocations
+            if (oldDepartmentLocations is not null)
+            {
+                foreach (var item in oldDepartmentLocations)
+                {
+                    var found = entity.DepartmentLocations
+                        .FirstOrDefault(d => d.LocationId == item.LocationId);
+                    if (found is null)
+                        _context.DepartmentLocations.Remove(item);
+                }
+
+                // this part was used to add new DepartmentLocations
+                // after refactoring it is not needed anymore
+                //foreach (var newItem in entity.DepartmentLocations)
+                //{
+                //    var found = oldDepartmentLocations
+                //        .FirstOrDefault(d => d.LocationId == newItem.LocationId);
+                //    if (found is null)
+                //        _context.DepartmentLocations.Add(newItem);
+                //}
+            }
+
+            // Not needed because entity is tracked by EF Core,
+            // and it wil auto update it when SaveChanges is called
+            // var entry = _context.Departments.Update(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+            return entity;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return ErrorHelper.Tree.ConcurrentUpdateFailed(entity.Id.Value);
+        }
     }
 }

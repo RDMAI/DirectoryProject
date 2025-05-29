@@ -1,6 +1,5 @@
 ﻿using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
-using DirectoryProject.DirectoryService.Domain.PositionValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -23,7 +22,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
         builder.Property(d => d.IsActive)
             .IsRequired()
             .HasColumnName("is_active");
-        //builder.HasQueryFilter(d => d.IsActive);  // global query filter
+        builder.HasQueryFilter(d => d.IsActive);  // global query filter
 
         builder.Property(d => d.Name)
             .HasConversion(
@@ -41,7 +40,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnName("parent_id");
 
         builder.HasOne(d => d.Parent)
-            .WithMany(d => d.ChildrenDepartments)
+            .WithMany()
             .HasForeignKey(d => d.ParentId)
             .OnDelete(DeleteBehavior.Restrict);  // restricts deletion of parent if it has any children
 
@@ -61,6 +60,14 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired()
             .HasColumnName("children_count");
 
+        //builder.Navigation(nameof(Department.DepartmentLocations))
+        //    .HasField("_departmentLocations");
+
+        //builder.HasMany("_departmentLocations")
+        //    .WithOne(nameof(DepartmentLocation.Department))
+        //    .HasForeignKey(nameof(DepartmentLocation.DepartmentId))
+        //    .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasMany(d => d.DepartmentLocations)
             .WithOne(dl => dl.Department)
             .HasForeignKey(dl => dl.DepartmentId)
@@ -79,5 +86,8 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
                 dst => dst.Kind == DateTimeKind.Utc ? dst : DateTime.SpecifyKind(dst, DateTimeKind.Utc))
             .IsRequired()
             .HasColumnName("updated_at");
+
+        builder.Property<uint>("version")
+            .IsRowVersion();
     }
 }

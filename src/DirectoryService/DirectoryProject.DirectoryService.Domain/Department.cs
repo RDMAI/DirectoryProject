@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
@@ -20,10 +21,11 @@ public class Department
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; private set; }
 
-    private IEnumerable<DepartmentLocation> _departmentLocations = [];
+    private List<DepartmentLocation> _departmentLocations = [];
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
 
-    public List<Department> ChildrenDepartments { get; set; } = []; // test to make ef core properly include Parent
+    // for optimistic locking in EF Core
+    private uint version;
 
     public static Result<Department> Create(
         Id<Department> id,
@@ -40,7 +42,7 @@ public class Department
             name: name,
             parentId: parent?.Id,
             path: pathResult.Value,
-            depth: (short)pathResult.Value.NLevel,
+            depth: CalculateDepth(pathResult.Value),
             childrenCount: 0,
             createdAt: createdAt);
     }
@@ -53,17 +55,14 @@ public class Department
         Name = name;
         ParentId = parentId;
         Path = path;
-        Depth = (short)Path.NLevel;
+        Depth = CalculateDepth(path);
 
         return this;
     }
 
     public Department UpdateLocations(IEnumerable<Id<Location>> locationIds)
     {
-        _departmentLocations = locationIds
-            .Select(locationId => new DepartmentLocation(
-                departmentId: Id,
-                locationId: locationId));
+        _departmentLocations = locationIds.Select(lid => new DepartmentLocation(Id, lid)).ToList();
 
         return this;
     }
@@ -72,6 +71,18 @@ public class Department
     {
         ChildrenCount++;
         return this;
+    }
+
+    public Department DecreaseChildrenCount()
+    {
+        if (ChildrenCount > 0)
+            ChildrenCount--;
+        return this;
+    }
+
+    public static short CalculateDepth(string path)
+    {
+        return (short)(path.Length - path.Replace(".", string.Empty).Length);
     }
 
     public static Result<LTree> CreatePath(DepartmentName name, string? parentPath)

@@ -52,5 +52,19 @@ public static class ErrorHelper
         {
             return Error.Conflict("value.is.invalid", $"Adding entity with id {entityId} creates cycle in entity's tree");
         }
+
+        public static Error ConcurrentUpdateFailed(Guid entityId)
+        {
+            return Error.Conflict(
+                "concurrent.update.failed",
+                $"Failed to update entity with id {entityId}, because it was already updated. Refresh the data and try again.");
+        }
+
+        public static Error ConcurrentUpdateFailed(string path)
+        {
+            return Error.Conflict(
+                "concurrent.update.failed",
+                $"Failed to update entity with path {path}, because it was already updated. Refresh the data and try again.");
+        }
     }
 }
