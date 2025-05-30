@@ -67,6 +67,8 @@ public class UpdatePositionHandler
         if (updateResult.IsFailure)
             return updateResult.Errors;
 
+        _logger.LogInformation("Position with id {id} was updated", entity.Id);
+
         return PositionDTO.FromDomainEntity(entity);
     }
 }

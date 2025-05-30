@@ -61,19 +61,19 @@ public class SoftDeleteDepartmentHandler
         if (childrenResult.Value.Any())
         {
             return ErrorHelper.Database.DeleteFailedConflict(
-                $"Failed to delete entity with path {entity.Path}, because it has active children");
+                $"Failed to delete Department with path {entity.Path}, because it has active children");
         }
 
         // check if entity has active locations
-        var locationsResult = await _locationRepository.GetLocationsForDepartmentAsync(
-            entity.Id,
-            cancellationToken);
-        if (locationsResult.IsFailure) return locationsResult.Errors;
-        if (locationsResult.Value.Any())
-        {
-            return ErrorHelper.Database.DeleteFailedConflict(
-                $"Department with id {entity.Id.Value} still has active locations");
-        }
+        //var locationsResult = await _locationRepository.GetLocationsForDepartmentAsync(
+        //    entity.Id,
+        //    cancellationToken);
+        //if (locationsResult.IsFailure) return locationsResult.Errors;
+        //if (locationsResult.Value.Any())
+        //{
+        //    return ErrorHelper.Database.DeleteFailedConflict(
+        //        $"Failed to delete Department with id {entity.Id.Value}. It still has active locations");
+        //}
 
         var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -96,6 +96,12 @@ public class SoftDeleteDepartmentHandler
             transaction.Rollback();
             return entityUpdateResult.Errors;
         }
+
+        transaction.Commit();
+
+        _logger.LogInformation("Department with id {id} was deactivated", entity.Id);
+        if (entity.Parent is not null)
+            _logger.LogInformation("Parent with id {id} was updated", entity.Parent.Id);
 
         return UnitResult.Success();
     }

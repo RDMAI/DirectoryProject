@@ -53,7 +53,7 @@ public class DepartmentRepository : IDepartmentRepository
         return result;
     }
 
-    public async Task<UnitResult> UpdateChildrenPathAsync(
+    public async Task<Result<int>> UpdateChildrenPathAsync(
         LTree oldPath,
         LTree newPath,
         CancellationToken cancellationToken = default)
@@ -67,7 +67,7 @@ public class DepartmentRepository : IDepartmentRepository
             // UPDATE item
             // SET path = NEW.path || subpath(path, nlevel(OLD.path))
             // WHERE path<@ OLD.path;
-            await _context.Departments
+            var changedCount = await _context.Departments
                 .Where(d => d.IsActive)
                 .Where(d => d.Path.IsDescendantOf(oldPath))
                 .Where(d => d.Path != newPath)
@@ -81,7 +81,7 @@ public class DepartmentRepository : IDepartmentRepository
                         d => d.Path.NLevel - 1 - oldDepth + newDepth),  // d.Path.NLevel - 1 won't work, because it will not be updated yet
                     cancellationToken);
 
-            return UnitResult.Success();
+            return changedCount;
         }
         catch (DbUpdateConcurrencyException)
         {

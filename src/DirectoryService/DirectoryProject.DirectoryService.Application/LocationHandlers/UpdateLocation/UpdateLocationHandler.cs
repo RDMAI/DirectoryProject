@@ -71,6 +71,8 @@ public class UpdateLocationHandler
         if (updateResult.IsFailure)
             return updateResult.Errors;
 
+        _logger.LogInformation("Location with id {id} was updated", entity.Id);
+
         return LocationDTO.FromDomainEntity(entity);
     }
 }
