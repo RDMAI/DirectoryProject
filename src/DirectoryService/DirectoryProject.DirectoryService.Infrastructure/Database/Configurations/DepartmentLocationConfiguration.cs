@@ -28,8 +28,17 @@ public class DepartmentLocationConfiguration : IEntityTypeConfiguration<Departme
         builder.HasOne(dl => dl.Department)
             .WithMany(d => d.DepartmentLocations)
             .HasForeignKey(dl => dl.DepartmentId);
+
+        //builder.HasOne(dl => dl.Department)
+        //    .WithMany("_departmentLocations")
+        //    .HasForeignKey(dl => dl.DepartmentId);
+
         builder.HasOne(dl => dl.Location)
             .WithMany(l => l.DepartmentLocations)
             .HasForeignKey(dl => dl.LocationId);
+
+        //builder.HasOne(dl => dl.Location)
+        //    .WithMany("_departmentLocations")
+        //    .HasForeignKey(dl => dl.LocationId);
     }
 }

@@ -1,5 +1,7 @@
-﻿using DirectoryProject.DirectoryService.WebAPI.Middlewares;
+﻿using DirectoryProject.DirectoryService.Infrastructure.Database;
+using DirectoryProject.DirectoryService.WebAPI.Middlewares;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
 
@@ -52,13 +54,18 @@ public static class DependencyInjection
         return services;
     }
 
-    public static WebApplication Configure(this WebApplication app)
+    public static async Task<WebApplication> ConfigureAsync(this WebApplication app)
     {
         app.UseMiddleware<ExceptionMiddleware>();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            await using var scope = app.Services.CreateAsyncScope();
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+            await dbContext.ApplyMigrationsAsync();
+
             app.UseSwagger();
             app.UseSwaggerUI();
         }

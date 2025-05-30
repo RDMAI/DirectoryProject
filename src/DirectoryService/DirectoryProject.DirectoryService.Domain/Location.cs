@@ -7,14 +7,14 @@ namespace DirectoryProject.DirectoryService.Domain;
 public class Location
 {
     public Id<Location> Id { get; }
-    public LocationName Name { get; }
-    public LocationAddress Address { get; }
-    public IANATimeZone TimeZone { get; }
+    public LocationName Name { get; private set; }
+    public LocationAddress Address { get; private set; }
+    public IANATimeZone TimeZone { get; private set; }
     public bool IsActive { get; } = true;
     public DateTime CreatedAt { get; }
-    public DateTime UpdatedAt { get; }
+    public DateTime UpdatedAt { get; private set; }
 
-    private readonly List<DepartmentLocation> _departmentLocations = [];
+    private List<DepartmentLocation> _departmentLocations = [];
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
 
     public static Result<Location> Create(
@@ -30,6 +30,19 @@ public class Location
             address,
             timeZone,
             createdAt);
+    }
+
+    public Location Update(
+        LocationName name,
+        LocationAddress address,
+        IANATimeZone timeZone)
+    {
+        Name = name;
+        Address = address;
+        TimeZone = timeZone;
+        UpdatedAt = DateTime.UtcNow;
+
+        return this;
     }
 
     // EF Core

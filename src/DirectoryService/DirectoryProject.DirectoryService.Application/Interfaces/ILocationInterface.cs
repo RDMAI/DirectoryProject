@@ -7,7 +7,19 @@ namespace DirectoryProject.DirectoryService.Application.Interfaces;
 
 public interface ILocationRepository
 {
+    Task<Result<Location>> GetByIdAsync(
+        Id<Location> id,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<Location>> GetByNameAsync(
+        LocationName name,
+        CancellationToken cancellationToken = default);
+
     Task<Result<Location>> CreateAsync(
+        Location entity,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<Location>> UpdateAsync(
         Location entity,
         CancellationToken cancellationToken = default);
 

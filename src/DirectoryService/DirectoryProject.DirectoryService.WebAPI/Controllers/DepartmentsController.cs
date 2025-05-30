@@ -1,6 +1,8 @@
 ﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+using DirectoryProject.DirectoryService.WebAPI.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Controllers;
@@ -38,12 +40,13 @@ public class DepartmentsController : ApplicationController
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update()
+    public async Task<IActionResult> Update(
+        [FromServices] ICommandHandler<UpdateDepartmentCommand, DepartmentDTO> handler,
+        [FromBody] UpdateDepartmentRequest request,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
     {
-        //обновление отдела
-        //    Валидация имени, родителя, локаций.
-        //    Автоматический расчёт slug, Path, Depth, ChildrenCount.
-        return Ok();
+        return ToAPIResponse(await handler.HandleAsync(request.ToCommand(id), cancellationToken));
     }
 
     [HttpDelete("{id:guid}")]

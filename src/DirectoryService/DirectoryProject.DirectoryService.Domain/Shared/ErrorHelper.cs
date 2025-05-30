@@ -45,4 +45,26 @@ public static class ErrorHelper
             return Error.Conflict("record.exists", $"{label} exists");
         }
     }
+
+    public static class Tree
+    {
+        public static Error CycleInTree(Guid entityId)
+        {
+            return Error.Conflict("value.is.invalid", $"Adding entity with id {entityId} creates cycle in entity's tree");
+        }
+
+        public static Error ConcurrentUpdateFailed(Guid entityId)
+        {
+            return Error.Conflict(
+                "concurrent.update.failed",
+                $"Failed to update entity with id {entityId}, because it was already updated. Refresh the data and try again.");
+        }
+
+        public static Error ConcurrentUpdateFailed(string path)
+        {
+            return Error.Conflict(
+                "concurrent.update.failed",
+                $"Failed to update entity with path {path}, because it was already updated. Refresh the data and try again.");
+        }
+    }
 }

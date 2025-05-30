@@ -7,11 +7,11 @@ namespace DirectoryProject.DirectoryService.Domain;
 public class Position
 {
     public Id<Position> Id { get; }
-    public PositionName Name { get; }
-    public PositionDescription Description { get; }
-    public bool IsActive { get; } = true;
+    public PositionName Name { get; private set; }
+    public PositionDescription Description { get; private set; }
+    public bool IsActive { get; private set; } = true;
     public DateTime CreatedAt { get; }
-    public DateTime UpdatedAt { get; }
+    public DateTime UpdatedAt { get; private set; }
 
     public static Result<Position> Create(
         Id<Position> id,
@@ -24,6 +24,17 @@ public class Position
             name,
             description,
             createdAt);
+    }
+
+    public Position Update(
+        PositionName name,
+        PositionDescription description)
+    {
+        Name = name;
+        Description = description;
+        UpdatedAt = DateTime.UtcNow;
+
+        return this;
     }
 
     // EF Core
