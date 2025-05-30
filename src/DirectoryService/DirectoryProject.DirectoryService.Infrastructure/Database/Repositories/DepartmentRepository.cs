@@ -40,6 +40,19 @@ public class DepartmentRepository : IDepartmentRepository
         return result;
     }
 
+    public async Task<Result<IEnumerable<Department>>> GetChildrenByPathAsync(
+        LTree path,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _context.Departments
+            .Where(d => d.IsActive)
+            .Where(d => d.Path.IsDescendantOf(path))
+            .Where(d => d.Path != path)
+            .ToListAsync(cancellationToken);
+
+        return result;
+    }
+
     public async Task<UnitResult> UpdateChildrenPathAsync(
         LTree oldPath,
         LTree newPath,

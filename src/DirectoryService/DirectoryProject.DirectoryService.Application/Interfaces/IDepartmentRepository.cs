@@ -25,6 +25,10 @@ public interface IDepartmentRepository
         LTree path,
         CancellationToken cancellationToken = default);
 
+    Task<Result<IEnumerable<Department>>> GetChildrenByPathAsync(
+        LTree path,
+        CancellationToken cancellationToken = default);
+
     Task<UnitResult> UpdateChildrenPathAsync(
         LTree oldPath,
         LTree newPath,

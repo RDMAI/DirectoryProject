@@ -4,7 +4,6 @@ using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
 
@@ -37,6 +36,19 @@ public class LocationRepository : ILocationRepository
             return ErrorHelper.General.NotFound(name.Value);
 
         return entity;
+    }
+
+    public async Task<Result<IEnumerable<Location>>> GetLocationsForDepartmentAsync(
+        Id<Department> id,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await (
+            from l in _context.Locations
+            join dl in _context.DepartmentLocations on l.Id equals dl.LocationId
+            where dl.DepartmentId == id
+            select l).ToListAsync(cancellationToken);
+
+        return result;
     }
 
     public async Task<Result<Location>> CreateAsync(

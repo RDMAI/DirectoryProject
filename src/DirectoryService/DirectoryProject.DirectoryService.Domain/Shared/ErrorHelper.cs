@@ -46,6 +46,16 @@ public static class ErrorHelper
         }
     }
 
+    public static class Database
+    {
+        public static Error DeleteFailedConflict(string message)
+        {
+            return Error.Conflict(
+                "delete.failed",
+                message);
+        }
+    }
+
     public static class Tree
     {
         public static Error CycleInTree(Guid entityId)

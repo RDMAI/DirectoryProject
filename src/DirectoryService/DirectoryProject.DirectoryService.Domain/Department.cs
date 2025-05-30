@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
@@ -77,6 +76,20 @@ public class Department
     {
         if (ChildrenCount > 0)
             ChildrenCount--;
+        return this;
+    }
+
+    public Department Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+        return this;
+    }
+
+    public Department Activate()
+    {
+        IsActive = true;
+        UpdatedAt = DateTime.UtcNow;
         return this;
     }
 
