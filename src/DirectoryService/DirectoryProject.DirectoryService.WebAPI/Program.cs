@@ -9,3 +9,5 @@ var app = builder.Build();
 await app.ConfigureAsync();
 
 app.Run();
+
+public partial class Program;  // to access Program class in test projects

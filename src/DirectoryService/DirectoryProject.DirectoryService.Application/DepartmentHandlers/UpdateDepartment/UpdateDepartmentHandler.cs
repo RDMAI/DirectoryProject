@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
@@ -104,25 +105,18 @@ public class UpdateDepartmentHandler
 
         // ef entity is unchanged return
         if ((isNameChanged || isParentChanged || areLocationsChanged) == false)
+        {
+            _logger.LogInformation(
+                "Department with id {id} was unchanged, because request didn't have any changes",
+                entity.Id);
             return DepartmentDTO.FromDomainEntity(entity);
+        }
 
         var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
         var oldParent = entity.Parent;
         var oldPath = entity.Path;
         var oldLocations = entity.DepartmentLocations;
-
-        // update entity
-        if (isNameChanged || isParentChanged)
-        {
-            entity.Update(
-                name: isNameChanged ? newName : entity.Name,
-                parentId: isParentChanged ? newParent?.Id : entity.ParentId,
-                path: updatedPathResult.Value);
-        }
-
-        if (areLocationsChanged)
-            entity.UpdateLocations(command.LocationIds.Select(Id<Location>.Create));
 
         // update old parent if not null
         if (isParentChanged && oldParent is not null)
@@ -148,7 +142,18 @@ public class UpdateDepartmentHandler
             }
         }
 
-        // update entity in database
+        // update entity
+        if (isNameChanged || isParentChanged)
+        {
+            entity.Update(
+                name: isNameChanged ? newName : entity.Name,
+                parentId: isParentChanged ? newParent?.Id : entity.ParentId,
+                path: updatedPathResult.Value);
+        }
+
+        if (areLocationsChanged)
+            entity.UpdateLocations(command.LocationIds.Select(Id<Location>.Create));
+
         if (isNameChanged || isParentChanged || areLocationsChanged)
         {
             var entityUpdateResult = await _departmentRepository.UpdateAsync(
@@ -163,6 +168,7 @@ public class UpdateDepartmentHandler
         }
 
         // update children if parent changed
+        int childrenChangedCount = 0;
         if (isNameChanged || isParentChanged)
         {
             var childrenUpdateResult = await _departmentRepository.UpdateChildrenPathAsync(
@@ -174,9 +180,19 @@ public class UpdateDepartmentHandler
                 transaction.Rollback();
                 return childrenUpdateResult.Errors;
             }
+
+            childrenChangedCount = childrenUpdateResult.Value;
         }
 
         transaction.Commit();
+
+        _logger.LogInformation("Department with id {id} was updated", entity.Id);
+        if (isParentChanged && oldParent is not null)
+            _logger.LogInformation("Old parent with id {id} was updated", oldParent.Id);
+        if (isParentChanged && newParent is not null)
+            _logger.LogInformation("New parent with id {id} was updated", newParent.Id);
+        if (childrenChangedCount > 0)
+            _logger.LogInformation("Updated {count} children", childrenChangedCount);
 
         return DepartmentDTO.FromDomainEntity(entity);
     }

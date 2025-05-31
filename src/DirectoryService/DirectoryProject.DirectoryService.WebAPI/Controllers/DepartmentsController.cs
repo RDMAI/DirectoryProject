@@ -1,4 +1,5 @@
 ﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDeleteDepartment;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
@@ -50,10 +51,13 @@ public class DepartmentsController : ApplicationController
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete()
+    public async Task<IActionResult> Delete(
+        [FromServices] ICommandHandler<SoftDeleteDepartmentCommand> handler,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
     {
-        //soft-delete отдела
-        //    запрет, если есть активные потомки.
-        return Ok();
+        var command = new SoftDeleteDepartmentCommand(id);
+
+        return ToAPIResponse(await handler.HandleAsync(command, cancellationToken));
     }
 }

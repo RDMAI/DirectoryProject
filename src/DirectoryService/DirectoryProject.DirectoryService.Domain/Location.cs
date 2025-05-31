@@ -10,7 +10,7 @@ public class Location
     public LocationName Name { get; private set; }
     public LocationAddress Address { get; private set; }
     public IANATimeZone TimeZone { get; private set; }
-    public bool IsActive { get; } = true;
+    public bool IsActive { get; private set; } = true;
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; private set; }
 
@@ -42,6 +42,20 @@ public class Location
         TimeZone = timeZone;
         UpdatedAt = DateTime.UtcNow;
 
+        return this;
+    }
+
+    public Location Deactivate()
+    {
+        IsActive = false;
+        UpdatedAt = DateTime.UtcNow;
+        return this;
+    }
+
+    public Location Activate()
+    {
+        IsActive = true;
+        UpdatedAt = DateTime.UtcNow;
         return this;
     }
 
