@@ -1,4 +1,5 @@
 ﻿using DirectoryProject.DirectoryService.Application.PositionHandlers.CreatePosition;
+using DirectoryProject.DirectoryService.Application.PositionHandlers.SoftDeletePosition;
 using DirectoryProject.DirectoryService.Application.PositionHandlers.UpdatePosition;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
@@ -26,5 +27,16 @@ public class PositionsController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         return ToAPIResponse(await handler.HandleAsync(request.ToCommand(id), cancellationToken));
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(
+        [FromServices] ICommandHandler<SoftDeletePositionCommand> handler,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = new SoftDeletePositionCommand(id);
+
+        return ToAPIResponse(await handler.HandleAsync(command, cancellationToken));
     }
 }

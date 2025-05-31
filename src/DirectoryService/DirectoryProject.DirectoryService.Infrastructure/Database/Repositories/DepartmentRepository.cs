@@ -154,4 +154,17 @@ public class DepartmentRepository : IDepartmentRepository
             return ErrorHelper.Tree.ConcurrentUpdateFailed(entity.Id.Value);
         }
     }
+
+    public async Task<Result<IEnumerable<Department>>> GetDepartmentsForLocationAsync(
+        Id<Location> id,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await (
+            from d in _context.Departments
+            join dl in _context.DepartmentLocations on d.Id equals dl.DepartmentId
+            where dl.LocationId == id
+            select d).ToListAsync(cancellationToken);
+
+        return result;
+    }
 }

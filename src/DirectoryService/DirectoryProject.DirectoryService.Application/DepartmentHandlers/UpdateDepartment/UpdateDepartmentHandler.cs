@@ -118,18 +118,6 @@ public class UpdateDepartmentHandler
         var oldPath = entity.Path;
         var oldLocations = entity.DepartmentLocations;
 
-        // update entity
-        if (isNameChanged || isParentChanged)
-        {
-            entity.Update(
-                name: isNameChanged ? newName : entity.Name,
-                parentId: isParentChanged ? newParent?.Id : entity.ParentId,
-                path: updatedPathResult.Value);
-        }
-
-        if (areLocationsChanged)
-            entity.UpdateLocations(command.LocationIds.Select(Id<Location>.Create));
-
         // update old parent if not null
         if (isParentChanged && oldParent is not null)
         {
@@ -154,7 +142,18 @@ public class UpdateDepartmentHandler
             }
         }
 
-        // update entity in database
+        // update entity
+        if (isNameChanged || isParentChanged)
+        {
+            entity.Update(
+                name: isNameChanged ? newName : entity.Name,
+                parentId: isParentChanged ? newParent?.Id : entity.ParentId,
+                path: updatedPathResult.Value);
+        }
+
+        if (areLocationsChanged)
+            entity.UpdateLocations(command.LocationIds.Select(Id<Location>.Create));
+
         if (isNameChanged || isParentChanged || areLocationsChanged)
         {
             var entityUpdateResult = await _departmentRepository.UpdateAsync(
