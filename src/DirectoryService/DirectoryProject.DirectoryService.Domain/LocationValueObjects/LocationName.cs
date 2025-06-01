@@ -9,6 +9,9 @@ public class LocationName
 
     public string Value { get; }
 
+    public static explicit operator string(LocationName locationName) =>
+        locationName.Value;
+
     public static Result<LocationName> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))

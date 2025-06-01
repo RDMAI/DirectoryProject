@@ -38,6 +38,17 @@ public class LocationRepository : ILocationRepository
         return entity;
     }
 
+    public async Task<Result<IEnumerable<Location>>> GetAsync(
+        Func<IQueryable<Location>, IQueryable<Location>> filterQuery,
+        CancellationToken cancellationToken = default)
+    {
+        IQueryable<Location> set = _context.Locations;
+        if (filterQuery is not null)
+            set = filterQuery(set);
+
+        return await set.ToListAsync(cancellationToken);
+    }
+
     public async Task<Result<IEnumerable<Location>>> GetLocationsForDepartmentAsync(
         Id<Department> id,
         CancellationToken cancellationToken = default)

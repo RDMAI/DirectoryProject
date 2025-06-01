@@ -15,6 +15,10 @@ public interface ILocationRepository
         LocationName name,
         CancellationToken cancellationToken = default);
 
+    Task<Result<IEnumerable<Location>>> GetAsync(
+        Func<IQueryable<Location>, IQueryable<Location>> filterQuery,
+        CancellationToken cancellationToken = default);
+
     Task<Result<IEnumerable<Location>>> GetLocationsForDepartmentAsync(
         Id<Department> id,
         CancellationToken cancellationToken = default);

@@ -24,13 +24,21 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnName("is_active");
         builder.HasQueryFilter(d => d.IsActive);  // global query filter
 
-        builder.Property(d => d.Name)
-            .HasConversion(
-                name => name.Value,
-                value => DepartmentName.Create(value).Value!)
-            .IsRequired()
-            .HasMaxLength(DepartmentName.MAX_LENGTH)
-            .HasColumnName("name");
+        builder.ComplexProperty(d => d.Name, ib =>
+        {
+            ib.Property(i => i.Value)
+                .IsRequired()
+                .HasMaxLength(DepartmentName.MAX_LENGTH)
+                .HasColumnName("name");
+        });
+
+        //builder.Property(d => d.Name)
+        //    .HasConversion(
+        //        name => name.Value,
+        //        value => DepartmentName.Create(value).Value!)
+        //    .IsRequired()
+        //    .HasMaxLength(DepartmentName.MAX_LENGTH)
+        //    .HasColumnName("name");
 
         builder.Property(d => d.ParentId)
             .HasConversion(
