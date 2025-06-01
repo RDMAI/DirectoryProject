@@ -118,30 +118,6 @@ public class UpdateDepartmentHandler
         var oldPath = entity.Path;
         var oldLocations = entity.DepartmentLocations;
 
-        // update old parent if not null
-        if (isParentChanged && oldParent is not null)
-        {
-            oldParent.DecreaseChildrenCount();
-            var oldParentUpdateResult = await _departmentRepository.UpdateAsync(oldParent, cancellationToken);
-            if (oldParentUpdateResult.IsFailure)
-            {
-                transaction.Rollback();
-                return oldParentUpdateResult.Errors;
-            }
-        }
-
-        // update new parent if not null
-        if (isParentChanged && newParent is not null)
-        {
-            newParent.IncreaseChildrenCount();
-            var newParentUpdateResult = await _departmentRepository.UpdateAsync(newParent, cancellationToken);
-            if (newParentUpdateResult.IsFailure)
-            {
-                transaction.Rollback();
-                return newParentUpdateResult.Errors;
-            }
-        }
-
         // update entity
         if (isNameChanged || isParentChanged)
         {
@@ -164,6 +140,30 @@ public class UpdateDepartmentHandler
             {
                 transaction.Rollback();
                 return entityUpdateResult.Errors;
+            }
+        }
+
+        // update old parent if not null
+        if (isParentChanged && oldParent is not null)
+        {
+            oldParent.DecreaseChildrenCount();
+            var oldParentUpdateResult = await _departmentRepository.UpdateAsync(oldParent, cancellationToken);
+            if (oldParentUpdateResult.IsFailure)
+            {
+                transaction.Rollback();
+                return oldParentUpdateResult.Errors;
+            }
+        }
+
+        // update new parent if not null
+        if (isParentChanged && newParent is not null)
+        {
+            newParent.IncreaseChildrenCount();
+            var newParentUpdateResult = await _departmentRepository.UpdateAsync(newParent, cancellationToken);
+            if (newParentUpdateResult.IsFailure)
+            {
+                transaction.Rollback();
+                return newParentUpdateResult.Errors;
             }
         }
 
