@@ -46,19 +46,23 @@ public class GetLocationsHandler
             if (string.IsNullOrEmpty(query.Search) == false)
                 locations = locations.ILike(d => d.Name, query.Search);
 
-            return locations.Skip((query.Page - 1) * query.Size).Take(query.Size);
+            return locations;
         };
 
         var result = await _locationRepository.GetAsync(
             queryFilter,
+            query.Page,
+            query.Size,
             cancellationToken);
         if (result.IsFailure)
             return result.Errors;
 
+        var resultList = result.Value.Values;
+
         return new FilteredListDTO<LocationDTO>(
             query.Page,
             query.Size,
-            result.Value.Select(LocationDTO.FromDomainEntity),
-            result.Value.Count());
+            resultList.Select(LocationDTO.FromDomainEntity),
+            result.Value.TotalCount);
     }
 }

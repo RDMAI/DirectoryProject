@@ -38,15 +38,23 @@ public class LocationRepository : ILocationRepository
         return entity;
     }
 
-    public async Task<Result<IEnumerable<Location>>> GetAsync(
+    public async Task<Result<(int TotalCount, IEnumerable<Location> Values)>> GetAsync(
         Func<IQueryable<Location>, IQueryable<Location>> filterQuery,
+        int Page,
+        int PageSize,
         CancellationToken cancellationToken = default)
     {
         IQueryable<Location> set = _context.Locations;
         if (filterQuery is not null)
             set = filterQuery(set);
 
-        return await set.ToListAsync(cancellationToken);
+        var totalCount = await set.CountAsync(cancellationToken);
+
+        var result = await set
+            .Skip((Page - 1) * PageSize).Take(PageSize)
+            .ToListAsync(cancellationToken);
+
+        return (totalCount, result);
     }
 
     public async Task<Result<IEnumerable<Location>>> GetLocationsForDepartmentAsync(

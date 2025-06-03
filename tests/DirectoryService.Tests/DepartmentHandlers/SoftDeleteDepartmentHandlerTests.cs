@@ -1,6 +1,4 @@
 ﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDeleteDepartment;
-using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
