@@ -49,6 +49,9 @@ public class CreateLocationHandler
             command.Address.City,
             command.Address.Street,
             command.Address.HouseNumber).Value!;
+        var isAddressUnique = await _locationRepository.IsAddressUniqueAsync(address, cancellationToken);
+        if (isAddressUnique.IsFailure)
+            return isAddressUnique.Errors;
 
         var timeZone = IANATimeZone.Create(command.TimeZone).Value!;
 

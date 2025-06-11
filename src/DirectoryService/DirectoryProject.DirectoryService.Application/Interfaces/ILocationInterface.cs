@@ -37,6 +37,10 @@ public interface ILocationRepository
         LocationName name,
         CancellationToken cancellationToken = default);
 
+    Task<UnitResult> IsAddressUniqueAsync(
+        LocationAddress address,
+        CancellationToken cancellationToken = default);
+
     Task<UnitResult> AreLocationsValidAsync(
         IEnumerable<Id<Location>> locationIds,
         CancellationToken cancellationToken = default);

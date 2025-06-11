@@ -9,6 +9,8 @@ public class Position
     public Id<Position> Id { get; }
     public PositionName Name { get; private set; }
     public PositionDescription Description { get; private set; }
+
+
     public bool IsActive { get; private set; } = true;
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; private set; }

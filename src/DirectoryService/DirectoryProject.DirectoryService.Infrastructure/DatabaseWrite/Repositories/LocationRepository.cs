@@ -5,6 +5,7 @@ using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 
@@ -98,6 +99,21 @@ public class LocationRepository : ILocationRepository
 
         if (existingLocation is not null)
             return ErrorHelper.General.AlreadyExist(name.Value);
+
+        return UnitResult.Success();
+    }
+
+    public async Task<UnitResult> IsAddressUniqueAsync(
+        LocationAddress address,
+        CancellationToken cancellationToken = default)
+    {
+        var existingLocation = await _context.Locations
+            .FirstOrDefaultAsync(d => d.Address.City == address.City &&
+                d.Address.Street == address.Street &&
+                d.Address.HouseNumber == address.HouseNumber);
+
+        if (existingLocation is not null)
+            return ErrorHelper.General.AlreadyExist($"{address.City} {address.Street} {address.HouseNumber}");
 
         return UnitResult.Success();
     }
