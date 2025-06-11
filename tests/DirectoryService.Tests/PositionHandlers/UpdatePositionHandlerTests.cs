@@ -1,19 +1,12 @@
-﻿using DirectoryProject.DirectoryService.Application.LocationHandlers.UpdateLocation;
-using DirectoryProject.DirectoryService.Application.PositionHandlers.UpdatePosition;
+﻿using DirectoryProject.DirectoryService.Application.PositionHandlers.UpdatePosition;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
-using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 using DirectoryProject.DirectoryService.Domain.PositionValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Tests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DirectoryService.Tests.PositionHandlers;
 
