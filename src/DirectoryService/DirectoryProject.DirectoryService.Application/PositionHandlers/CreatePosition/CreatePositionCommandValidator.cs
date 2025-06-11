@@ -16,7 +16,7 @@ public class CreatePositionCommandValidator : AbstractValidator<CreatePositionCo
             .MustBeValueObject(PositionDescription.Create);
 
         RuleFor(c => c.DepartmentIds)
-                .NotEmpty()
-                .WithError(ErrorHelper.General.ValueIsNullOrEmpty("DepartmentIds"));
+            .NotEmpty()
+            .WithError(ErrorHelper.General.ValueIsNullOrEmpty("DepartmentIds"));
     }
 }
