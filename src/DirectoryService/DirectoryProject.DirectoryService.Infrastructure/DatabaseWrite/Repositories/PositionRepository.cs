@@ -5,13 +5,13 @@ using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 
 public class PositionRepository : IPositionRepository
 {
-    private readonly ApplicationDBContext _context;
+    private readonly ApplicationWriteDBContext _context;
 
-    public PositionRepository(ApplicationDBContext context)
+    public PositionRepository(ApplicationWriteDBContext context)
     {
         _context = context;
     }

@@ -1,15 +1,16 @@
 ﻿using DirectoryProject.DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 
-public class ApplicationDBContext : DbContext
+public class ApplicationWriteDBContext : DbContext
 {
     public const string DATABASE_CONFIGURATION = "PostgresDB";
 
     private readonly string _connectionString;
 
-    public ApplicationDBContext(
+    public ApplicationWriteDBContext(
         string connectionString)
     {
         _connectionString = connectionString;
@@ -22,7 +23,7 @@ public class ApplicationDBContext : DbContext
 
     public async Task ApplyMigrationsAsync()
     {
-        await Database.MigrateAsync();
+        //await Database.MigrateAsync();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -42,8 +43,8 @@ public class ApplicationDBContext : DbContext
         modelBuilder.HasPostgresExtension("ltree");  // used in entities: Department
 
         modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(ApplicationDBContext).Assembly,
-            type => type.FullName?.Contains("Database.Configurations") ?? false);
+            typeof(ApplicationWriteDBContext).Assembly,
+            type => type.GetInterfaces().Any(i => i.Name == typeof(IEntityTypeConfiguration<>).Name));
 
         base.OnModelCreating(modelBuilder);
     }

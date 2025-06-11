@@ -4,7 +4,7 @@ using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Configurations;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Configurations;
 
 public class LocationConfiguration : IEntityTypeConfiguration<Location>
 {
@@ -52,17 +52,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
                 .HasMaxLength(LocationAddress.HOUSENUMBER_MAX_LENGTH);
         });
 
-        //builder.Property(d => d.Address)
-        //    .HasConversion(
-        //        reqToDB => JsonSerializer.Serialize(reqToDB, JsonSerializerOptions.Default),
-        //        jsonFromDB => JsonSerializer.Deserialize<LocationAddress>(jsonFromDB, JsonSerializerOptions.Default)!,
-        //        new ValueComparer<LocationAddress>(
-        //            (v1, v2) => v1! == v2!,
-        //            v1 => v1.GetHashCode(),
-        //            v1 => LocationAddress.Create(v1.City, v1.Street, v1.HouseNumber).Value!))
-        //    .HasColumnType("jsonb")
-        //    .HasColumnName("address");
-
         builder.ComplexProperty(d => d.TimeZone, ib =>
         {
             ib.Property(i => i.Value)
@@ -77,11 +66,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
             .WithOne(dl => dl.Location)
             .HasForeignKey(dl => dl.LocationId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        //builder.HasMany("_departmentLocations")
-        //    .WithOne(nameof(DepartmentLocation.Location))
-        //    .HasForeignKey(nameof(DepartmentLocation.LocationId))
-        //    .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(d => d.CreatedAt)
             .HasConversion(

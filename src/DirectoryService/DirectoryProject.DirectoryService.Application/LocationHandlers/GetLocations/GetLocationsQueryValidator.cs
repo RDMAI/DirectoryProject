@@ -14,6 +14,6 @@ public class GetLocationsQueryValidator : AbstractValidator<GetLocationsQuery>
 
         RuleFor(q => q.Size)
             .Must(d => d > 0 && d < 1000)
-            .WithError(ErrorHelper.General.ValueIsInvalid(nameof(GetLocationsQuery.Page)));
+            .WithError(ErrorHelper.General.ValueIsInvalid(nameof(GetLocationsQuery.Size)));
     }
 }

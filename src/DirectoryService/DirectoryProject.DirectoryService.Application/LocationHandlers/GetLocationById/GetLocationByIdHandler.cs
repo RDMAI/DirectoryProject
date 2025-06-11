@@ -1,11 +1,10 @@
-﻿using DirectoryProject.DirectoryService.Application.Interfaces;
+﻿using Dapper;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
-using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.Shared;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using static Dapper.SqlMapper;
 
 namespace DirectoryProject.DirectoryService.Application.LocationHandlers.GetLocationById;
 
@@ -14,16 +13,23 @@ public class GetLocationByIdHandler
 {
     private readonly AbstractValidator<GetLocationByIdQuery> _validator;
     private readonly ILogger<GetLocationByIdHandler> _logger;
-    private readonly ILocationRepository _locationRepository;
+    private readonly IDBConnectionFactory _connectionFactory;
+
+    private const string SQLQUERY =
+        """
+        SELECT id, name, address, time_zone
+        FROM diretory_service.locations
+        WHERE id = @id and is_active = true
+        """;
 
     public GetLocationByIdHandler(
         AbstractValidator<GetLocationByIdQuery> validator,
         ILogger<GetLocationByIdHandler> logger,
-        ILocationRepository locationRepository)
+        IDBConnectionFactory connectionFactory)
     {
         _validator = validator;
         _logger = logger;
-        _locationRepository = locationRepository;
+        _connectionFactory = connectionFactory;
     }
 
     public async Task<Result<LocationDTO>> HandleAsync(
@@ -39,11 +45,20 @@ public class GetLocationByIdHandler
                 .ToList();
         }
 
-        var id = Id<Location>.Create(query.Id);
-        var result = await _locationRepository.GetByIdAsync(id, cancellationToken);
-        if (result.IsFailure)
-            return result.Errors;
+        var parameters = new DynamicParameters();
+        parameters.Add("@id", query.Id);
 
-        return LocationDTO.FromDomainEntity(result.Value);
+        using var connection = _connectionFactory.Create();
+
+        var result = await connection.QueryFirstOrDefaultAsync<LocationDTO>(new CommandDefinition(
+            commandText: SQLQUERY,
+            parameters: parameters,
+            cancellationToken: cancellationToken));
+        if (result is null)
+            return ErrorHelper.General.NotFound(query.Id);
+
+        _logger.LogInformation("Location with id {id} red", query.Id);
+
+        return result;
     }
 }

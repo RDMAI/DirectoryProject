@@ -23,6 +23,11 @@ public class Department
     private List<DepartmentLocation> _departmentLocations = [];
     public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
 
+    //private List<Department> _children = [];
+    //public IReadOnlyList<Department> Children => _children.ToList();
+
+    public List<Department> Children { get; private set; }
+
     // for optimistic locking in EF Core
     private uint version;
 

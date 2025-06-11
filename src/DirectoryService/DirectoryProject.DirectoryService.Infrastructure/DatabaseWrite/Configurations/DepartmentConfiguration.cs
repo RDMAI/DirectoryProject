@@ -4,7 +4,7 @@ using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Configurations;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Configurations;
 
 public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
 {
@@ -32,14 +32,6 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
                 .HasColumnName("name");
         });
 
-        //builder.Property(d => d.Name)
-        //    .HasConversion(
-        //        name => name.Value,
-        //        value => DepartmentName.Create(value).Value!)
-        //    .IsRequired()
-        //    .HasMaxLength(DepartmentName.MAX_LENGTH)
-        //    .HasColumnName("name");
-
         builder.Property(d => d.ParentId)
             .HasConversion(
                 id => id != null ? id.Value : (Guid?)null,
@@ -48,7 +40,7 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasColumnName("parent_id");
 
         builder.HasOne(d => d.Parent)
-            .WithMany()
+            .WithMany(d => d.Children)
             .HasForeignKey(d => d.ParentId)
             .OnDelete(DeleteBehavior.Restrict);  // restricts deletion of parent if it has any children
 

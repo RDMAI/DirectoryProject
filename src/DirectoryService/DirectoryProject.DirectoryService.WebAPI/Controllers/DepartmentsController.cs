@@ -1,20 +1,24 @@
 ﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDeleteDepartment;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.WebAPI.Requests;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Controllers;
 
 public class DepartmentsController : ApplicationController
 {
     [HttpGet("roots")]
-    public async Task<IActionResult> GetRoots()
+    public async Task<IActionResult> GetRoots(
+        [FromServices] IQueryHandler<GetRootDepartmentsQuery, FilteredListDTO<DepartmentTreeDTO>> handler,
+        [FromQuery] GetRootDepartmentsQuery query,
+        CancellationToken cancellationToken = default)
     {
-        //страницы корней + prefetch детей.
-        return Ok();
+        return ToAPIResponse(await handler.HandleAsync(query, cancellationToken));
     }
 
     [HttpGet("{id:guid}/children")]

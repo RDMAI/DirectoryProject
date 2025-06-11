@@ -3,15 +3,16 @@ using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.EntityFrameworkCore;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 
 public class LocationRepository : ILocationRepository
 {
-    private readonly ApplicationDBContext _context;
+    private readonly ApplicationWriteDBContext _context;
 
-    public LocationRepository(ApplicationDBContext context)
+    public LocationRepository(ApplicationWriteDBContext context)
     {
         _context = context;
     }
