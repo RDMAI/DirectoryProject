@@ -28,7 +28,7 @@ public class GetLocationsHandlerTests : DirectoryServiceBaseHandlerTests
             _context.Locations.Add(
                 Location.Create(
                     id: Id<Location>.GenerateNew(),
-                    name: LocationName.Create($"Test Location {i}").Value,
+                    name: LocationName.Create($"{i} Test Location").Value,
                     address: LocationAddress.Create(
                         city: "Moscow",
                         street: "Lenina",

@@ -75,15 +75,15 @@ public class GetRootDepartmentsHandler
             _logger,
             cancellationToken);
 
-        var parameters = new DynamicParameters();
-        parameters.Add("@offset", (query.Page - 1) * query.Size);
-        parameters.Add("@limit", query.Size);
-        parameters.Add("@prefetch", query.Prefetch);
+        var multipleSelectBuilder = new CustomSQLBuilder(MULTIPLE_SELECT_SQL_QUERY);
+        multipleSelectBuilder.Parameters.Add("@offset", (query.Page - 1) * query.Size);
+        multipleSelectBuilder.Parameters.Add("@limit", query.Size);
+        multipleSelectBuilder.Parameters.Add("@prefetch", query.Prefetch);
 
-        var result = await connection.QueryMultipleAsync(new CommandDefinition(
-            MULTIPLE_SELECT_SQL_QUERY,
-            parameters: parameters,
-            cancellationToken: cancellationToken));
+        var result = await connection.QueryMultipleAsync(
+            multipleSelectBuilder,
+            _logger,
+            cancellationToken);
 
         var roots = result.Read<DepartmentTreeDTO>().AsList();
         var children = result.Read<DepartmentTreeDTO>();
