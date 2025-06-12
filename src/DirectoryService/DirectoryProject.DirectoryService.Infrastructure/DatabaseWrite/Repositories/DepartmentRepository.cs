@@ -43,66 +43,6 @@ public class DepartmentRepository : IDepartmentRepository
         return result;
     }
 
-    public async Task<Result<(int TotalCount, IEnumerable<DepartmentTreeDTO> Values)>> GetRootsWithChildrenAsync(
-        int Page,
-        int PageSize,
-        int Prefetch,
-        CancellationToken cancellationToken = default)
-    {
-        var totalCount = await _context.Departments
-            .Where(d => d.ParentId == null)
-            .CountAsync(cancellationToken);
-
-        IQueryable<Department> set = _context.Departments;
-        if (Prefetch >= 1)
-            set = set.Include(d => d.Children);
-        if (Prefetch >= 2)
-            set = ((IIncludableQueryable<Department, IEnumerable<Department>>)set).ThenInclude(d => d.Children);
-        if (Prefetch >= 3)
-            set = ((IIncludableQueryable<Department, IEnumerable<Department>>)set).ThenInclude(d => d.Children);
-
-        //set.Select(d => new DepartmentTreeDTO(
-        //    d.Id.Value,
-        //    d.Name.Value,
-        //    d.Path,
-        //    d.Depth,
-        //    d.Children,
-        //    d.ChildrenCount));
-
-        var rootsWithChildrenQuery = set.Skip((Page - 1) * PageSize).Take(PageSize);
-        var rootsWithChildren = await rootsWithChildrenQuery.ToListAsync(cancellationToken);
-
-        //var rootsWithChildren = await (
-        //    from d in _context.Departments
-        //    where d.ParentId == null
-        //    select new
-        //    {
-        //        Root = d,
-        //        Children = (from ch in _context.Departments
-        //                    where ch.Path.IsDescendantOf(d.Path) && ch.Depth == 1
-        //                    select ch).ToList()
-        //    }).Skip((Page - 1) * PageSize).Take(PageSize)
-        //    .ToListAsync(cancellationToken);
-
-        //List<DepartmentTreeDTO> result = [];
-        //foreach (var tree in rootsWithChildren)
-        //{
-        //    result.Add(DepartmentTreeDTO.FromDomainEntity(
-        //        entity: tree.Root,
-        //        children: tree.Children));
-        //}
-
-        List<DepartmentTreeDTO> result = [];
-        foreach (var dep in rootsWithChildren)
-        {
-            result.Add(DepartmentTreeDTO.FromDomainEntity(
-                entity: dep,
-                children: dep.Children));
-        }
-
-        return (totalCount, result);
-    }
-
     public async Task<Result<IEnumerable<Department>>> GetChildrenByPathAsync(
         LTree path,
         CancellationToken cancellationToken = default)
@@ -229,5 +169,23 @@ public class DepartmentRepository : IDepartmentRepository
             select d).ToListAsync(cancellationToken);
 
         return result;
+    }
+
+    public async Task<UnitResult> AreDepartmentsValidAsync(
+        IEnumerable<Id<Department>> departmentIds,
+        CancellationToken cancellationToken = default)
+    {
+        var existingIds = await _context.Departments
+            .Where(d => departmentIds.Contains(d.Id))
+            .Select(d => d.Id)
+            .ToListAsync(cancellationToken);
+
+        foreach (var id in existingIds)
+        {
+            if (departmentIds.FirstOrDefault(id) is null)
+                return ErrorHelper.General.NotFound(id.Value);
+        }
+
+        return UnitResult.Success();
     }
 }

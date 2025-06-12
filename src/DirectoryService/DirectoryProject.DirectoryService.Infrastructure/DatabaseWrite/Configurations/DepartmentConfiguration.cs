@@ -72,6 +72,11 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .HasForeignKey(dl => dl.DepartmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(d => d.DepartmentPositions)
+            .WithOne(dp => dp.Department)
+            .HasForeignKey(dp => dp.DepartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Property(d => d.CreatedAt)
             .HasConversion(
                 src => src.Kind == DateTimeKind.Utc ? src : DateTime.SpecifyKind(src, DateTimeKind.Utc),

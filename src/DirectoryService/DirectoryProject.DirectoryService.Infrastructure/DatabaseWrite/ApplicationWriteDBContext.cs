@@ -1,6 +1,5 @@
 ﻿using DirectoryProject.DirectoryService.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 
@@ -18,12 +17,13 @@ public class ApplicationWriteDBContext : DbContext
 
     public DbSet<Department> Departments { get; set; }
     public DbSet<DepartmentLocation> DepartmentLocations { get; set; }
+    public DbSet<DepartmentPosition> DepartmentPositions { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<Position> Positions { get; set; }
 
     public async Task ApplyMigrationsAsync()
     {
-        //await Database.MigrateAsync();
+        await Database.MigrateAsync();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

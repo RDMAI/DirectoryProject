@@ -16,14 +16,17 @@ public class CreatePositionHandler
     private readonly AbstractValidator<CreatePositionCommand> _validator;
     private readonly ILogger<CreatePositionHandler> _logger;
     private readonly IPositionRepository _positionRepository;
+    private readonly IDepartmentRepository _departmentRepository;
 
     public CreatePositionHandler(
         AbstractValidator<CreatePositionCommand> validator,
         IPositionRepository positionRepository,
+        IDepartmentRepository departmentRepository,
         ILogger<CreatePositionHandler> logger)
     {
         _validator = validator;
         _positionRepository = positionRepository;
+        _departmentRepository = departmentRepository;
         _logger = logger;
     }
 
@@ -45,13 +48,25 @@ public class CreatePositionHandler
         if (isNameUnique.IsFailure)
             return isNameUnique.Errors;
 
-        var result = await _positionRepository.CreateAsync(
-            entity: Position.Create(
+        // validate departments
+        var departmentIds = command.DepartmentIds.Select(Id<Department>.Create);
+        var areLocationsValidResult = await _departmentRepository.AreDepartmentsValidAsync(
+            departmentIds,
+            cancellationToken);
+        if (areLocationsValidResult.IsFailure)
+            return areLocationsValidResult.Errors;
+
+        var entity = Position.Create(
                 id: Id<Position>.GenerateNew(),
                 name: name,
                 description: PositionDescription.Create(command.Description).Value,
-                createdAt: DateTime.UtcNow).Value!,
-            cancellationToken: cancellationToken);
+                createdAt: DateTime.UtcNow).Value;
+
+        entity.UpdateDepartments(departmentIds);
+
+        var result = await _positionRepository.CreateAsync(
+            entity,
+            cancellationToken);
 
         if (result.IsFailure)
             return result.Errors;

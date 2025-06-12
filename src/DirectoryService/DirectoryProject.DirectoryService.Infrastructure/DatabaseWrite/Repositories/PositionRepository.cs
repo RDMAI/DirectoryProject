@@ -50,8 +50,21 @@ public class PositionRepository : IPositionRepository
 
     public async Task<Result<Position>> UpdateAsync(
         Position entity,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IEnumerable<DepartmentPosition>? oldDepartmentPositions = null)
     {
+        // sync DepartmentPositions
+        if (oldDepartmentPositions is not null)
+        {
+            foreach (var item in oldDepartmentPositions)
+            {
+                var found = entity.DepartmentPositions
+                    .FirstOrDefault(d => d.PositionId == item.PositionId);
+                if (found is null)
+                    _context.DepartmentPositions.Remove(item);
+            }
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return entity;

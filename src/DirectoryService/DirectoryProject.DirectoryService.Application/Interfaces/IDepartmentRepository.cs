@@ -22,12 +22,6 @@ public interface IDepartmentRepository
         Id<Department> id,
         CancellationToken cancellationToken = default);
 
-    Task<Result<(int TotalCount, IEnumerable<DepartmentTreeDTO> Values)>> GetRootsWithChildrenAsync(
-        int Page,
-        int PageSize,
-        int Prefetch,
-        CancellationToken cancellationToken = default);
-
     Task<Result<IEnumerable<Department>>> GetDepartmentsForLocationAsync(
         Id<Location> id,
         CancellationToken cancellationToken = default);
@@ -47,5 +41,9 @@ public interface IDepartmentRepository
 
     Task<UnitResult> IsPathUniqueAsync(
         LTree path,
+        CancellationToken cancellationToken = default);
+
+    Task<UnitResult> AreDepartmentsValidAsync(
+        IEnumerable<Id<Department>> departmentIds,
         CancellationToken cancellationToken = default);
 }

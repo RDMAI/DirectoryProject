@@ -1,7 +1,10 @@
 ﻿using DirectoryProject.DirectoryService.Application.PositionHandlers.CreatePosition;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+using DirectoryProject.DirectoryService.Domain;
+using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.PositionValueObjects;
+using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Tests;
@@ -22,9 +25,17 @@ public class CreatePositionHandlerTests : DirectoryServiceBaseHandlerTests
     public async Task HandleAsync_AddingPositionWithValidCommand_ReturnSuccess()
     {
         // Arrange
+        var dep = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Test dep").Value,
+            parent: null,
+            createdAt: DateTime.UtcNow).Value;
+        _context.Departments.Add(dep);
+
         var command = new CreatePositionCommand(
             Name: "Test Position",
-            Description: "Test description");
+            Description: "Test description",
+            DepartmentIds: [dep.Id.Value]);
 
         var ct = new CancellationTokenSource().Token;
 
@@ -42,5 +53,6 @@ public class CreatePositionHandlerTests : DirectoryServiceBaseHandlerTests
         var entity = await _context.Positions.FirstOrDefaultAsync(d => d.Name == testName);
         Assert.True(entity is not null, "Entity from database is null");
         Assert.True(entity.IsActive, "Entity is not active");
+        Assert.True(entity.DepartmentPositions.Any(), "Position is not added to Department");
     }
 }

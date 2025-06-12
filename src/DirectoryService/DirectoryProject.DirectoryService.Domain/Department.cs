@@ -21,10 +21,10 @@ public class Department
     public DateTime UpdatedAt { get; private set; }
 
     private List<DepartmentLocation> _departmentLocations = [];
-    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.AsReadOnly();
 
-    //private List<Department> _children = [];
-    //public IReadOnlyList<Department> Children => _children.ToList();
+    private List<DepartmentPosition> _departmentPositions = [];
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
 
     public List<Department> Children { get; private set; }
 
