@@ -3,15 +3,17 @@ using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 
 public class LocationRepository : ILocationRepository
 {
-    private readonly ApplicationDBContext _context;
+    private readonly ApplicationWriteDBContext _context;
 
-    public LocationRepository(ApplicationDBContext context)
+    public LocationRepository(ApplicationWriteDBContext context)
     {
         _context = context;
     }
@@ -36,6 +38,25 @@ public class LocationRepository : ILocationRepository
             return ErrorHelper.General.NotFound(name.Value);
 
         return entity;
+    }
+
+    public async Task<Result<(int TotalCount, IEnumerable<Location> Values)>> GetAsync(
+        Func<IQueryable<Location>, IQueryable<Location>> filterQuery,
+        int Page,
+        int PageSize,
+        CancellationToken cancellationToken = default)
+    {
+        IQueryable<Location> set = _context.Locations;
+        if (filterQuery is not null)
+            set = filterQuery(set);
+
+        var totalCount = await set.CountAsync(cancellationToken);
+
+        var result = await set
+            .Skip((Page - 1) * PageSize).Take(PageSize)
+            .ToListAsync(cancellationToken);
+
+        return (totalCount, result);
     }
 
     public async Task<Result<IEnumerable<Location>>> GetLocationsForDepartmentAsync(
@@ -78,6 +99,21 @@ public class LocationRepository : ILocationRepository
 
         if (existingLocation is not null)
             return ErrorHelper.General.AlreadyExist(name.Value);
+
+        return UnitResult.Success();
+    }
+
+    public async Task<UnitResult> IsAddressUniqueAsync(
+        LocationAddress address,
+        CancellationToken cancellationToken = default)
+    {
+        var existingLocation = await _context.Locations
+            .FirstOrDefaultAsync(d => d.Address.City == address.City &&
+                d.Address.Street == address.Street &&
+                d.Address.HouseNumber == address.HouseNumber);
+
+        if (existingLocation is not null)
+            return ErrorHelper.General.AlreadyExist($"{address.City} {address.Street} {address.HouseNumber}");
 
         return UnitResult.Success();
     }

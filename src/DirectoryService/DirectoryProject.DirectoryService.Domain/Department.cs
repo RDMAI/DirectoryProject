@@ -21,7 +21,12 @@ public class Department
     public DateTime UpdatedAt { get; private set; }
 
     private List<DepartmentLocation> _departmentLocations = [];
-    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.ToList();
+    public IReadOnlyList<DepartmentLocation> DepartmentLocations => _departmentLocations.AsReadOnly();
+
+    private List<DepartmentPosition> _departmentPositions = [];
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
+
+    public List<Department> Children { get; private set; }
 
     // for optimistic locking in EF Core
     private uint version;

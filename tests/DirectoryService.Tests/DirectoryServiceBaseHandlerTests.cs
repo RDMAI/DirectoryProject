@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Infrastructure.Database;
+﻿using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Tests;
 
@@ -8,10 +8,10 @@ public class DirectoryServiceBaseHandlerTests : BaseHandlerTests
 {
     public DirectoryServiceBaseHandlerTests(TestWebFactory webFactory) : base(webFactory)
     {
-        _context = _scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+        _context = _scope.ServiceProvider.GetRequiredService<ApplicationWriteDBContext>();
     }
 
-    protected readonly ApplicationDBContext _context;
+    protected readonly ApplicationWriteDBContext _context;
 
     public override async Task DisposeAsync()
     {

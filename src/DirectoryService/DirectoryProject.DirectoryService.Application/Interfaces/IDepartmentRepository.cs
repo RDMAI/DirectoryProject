@@ -1,4 +1,5 @@
-﻿using DirectoryProject.DirectoryService.Domain;
+﻿using DirectoryProject.DirectoryService.Application.Shared.DTOs;
+using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
@@ -40,5 +41,9 @@ public interface IDepartmentRepository
 
     Task<UnitResult> IsPathUniqueAsync(
         LTree path,
+        CancellationToken cancellationToken = default);
+
+    Task<UnitResult> AreDepartmentsValidAsync(
+        IEnumerable<Id<Department>> departmentIds,
         CancellationToken cancellationToken = default);
 }

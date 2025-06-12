@@ -15,6 +15,12 @@ public interface ILocationRepository
         LocationName name,
         CancellationToken cancellationToken = default);
 
+    Task<Result<(int TotalCount, IEnumerable<Location> Values)>> GetAsync(
+        Func<IQueryable<Location>, IQueryable<Location>> filterQuery,
+        int Page,
+        int PageSize,
+        CancellationToken cancellationToken = default);
+
     Task<Result<IEnumerable<Location>>> GetLocationsForDepartmentAsync(
         Id<Department> id,
         CancellationToken cancellationToken = default);
@@ -29,6 +35,10 @@ public interface ILocationRepository
 
     Task<UnitResult> IsNameUniqueAsync(
         LocationName name,
+        CancellationToken cancellationToken = default);
+
+    Task<UnitResult> IsAddressUniqueAsync(
+        LocationAddress address,
         CancellationToken cancellationToken = default);
 
     Task<UnitResult> AreLocationsValidAsync(

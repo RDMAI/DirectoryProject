@@ -1,4 +1,6 @@
-﻿using DirectoryProject.DirectoryService.Infrastructure.Database;
+﻿using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+using DirectoryProject.DirectoryService.Infrastructure.DatabaseRead;
+using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -25,7 +27,7 @@ public class TestWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
         using var scope = Services.CreateScope();
 
         var accountContext =
-            scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+            scope.ServiceProvider.GetRequiredService<ApplicationWriteDBContext>();
 
         await accountContext.Database.EnsureDeletedAsync();
 
@@ -54,7 +56,10 @@ public class TestWebFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected virtual void ReplaceServices(IServiceCollection services)
     {
-        services.RemoveAll<ApplicationDBContext>();
-        services.AddScoped(_ => new ApplicationDBContext(_connectionString));
+        services.RemoveAll<ApplicationWriteDBContext>();
+        services.AddScoped(_ => new ApplicationWriteDBContext(_connectionString));
+
+        services.RemoveAll<IDBConnectionFactory>();
+        services.AddScoped<IDBConnectionFactory>(_ => new ReadDBConnectionFactory(_connectionString));
     }
 }

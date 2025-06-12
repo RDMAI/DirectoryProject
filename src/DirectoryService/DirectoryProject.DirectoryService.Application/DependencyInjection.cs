@@ -45,12 +45,22 @@ public static class DependencyInjection
                 services.AddScoped(type.BaseType, type);
 
             // check if type implements ICommandHandler interface
-            var interfaceType = type.GetInterfaces().FirstOrDefault(i =>
+            var commandInterfaceType = type.GetInterfaces().FirstOrDefault(i =>
                 i.Name! == typeof(ICommandHandler<>).Name || i.Name! == typeof(ICommandHandler<,>).Name);
-            if (interfaceType == null)
+            if (commandInterfaceType is not null)
+            {
+                services.AddScoped(commandInterfaceType, type);
                 continue;
+            }
 
-            services.AddScoped(interfaceType, type);
+            // check if type implements IQueryHandler interface
+            var queryInterfaceType = type.GetInterfaces().FirstOrDefault(i =>
+                i.Name! == typeof(IQueryHandler<,>).Name);
+            if (queryInterfaceType is not null)
+            {
+                services.AddScoped(queryInterfaceType, type);
+                continue;
+            }
         }
 
         return services;

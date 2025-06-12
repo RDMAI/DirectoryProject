@@ -2,12 +2,12 @@
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 public class DirectoryServiceUnitOfWork : IUnitOfWork
 {
-    private readonly ApplicationDBContext _dbContext;
+    private readonly ApplicationWriteDBContext _dbContext;
 
-    public DirectoryServiceUnitOfWork(ApplicationDBContext dbContext)
+    public DirectoryServiceUnitOfWork(ApplicationWriteDBContext dbContext)
     {
         _dbContext = dbContext;
     }

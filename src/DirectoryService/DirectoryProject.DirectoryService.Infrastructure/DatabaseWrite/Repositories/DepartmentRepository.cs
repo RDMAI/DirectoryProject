@@ -1,16 +1,19 @@
 ﻿using DirectoryProject.DirectoryService.Application.Interfaces;
+using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 
 public class DepartmentRepository : IDepartmentRepository
 {
-    private readonly ApplicationDBContext _context;
+    private readonly ApplicationWriteDBContext _context;
 
-    public DepartmentRepository(ApplicationDBContext context)
+    public DepartmentRepository(ApplicationWriteDBContext context)
     {
         _context = context;
     }
@@ -166,5 +169,23 @@ public class DepartmentRepository : IDepartmentRepository
             select d).ToListAsync(cancellationToken);
 
         return result;
+    }
+
+    public async Task<UnitResult> AreDepartmentsValidAsync(
+        IEnumerable<Id<Department>> departmentIds,
+        CancellationToken cancellationToken = default)
+    {
+        var existingIds = await _context.Departments
+            .Where(d => departmentIds.Contains(d.Id))
+            .Select(d => d.Id)
+            .ToListAsync(cancellationToken);
+
+        foreach (var id in existingIds)
+        {
+            if (departmentIds.FirstOrDefault(id) is null)
+                return ErrorHelper.General.NotFound(id.Value);
+        }
+
+        return UnitResult.Success();
     }
 }

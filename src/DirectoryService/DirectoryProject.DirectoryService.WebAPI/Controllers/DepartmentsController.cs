@@ -1,4 +1,6 @@
 ﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetChildrenDepartments;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDeleteDepartment;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
@@ -11,24 +13,22 @@ namespace DirectoryProject.DirectoryService.WebAPI.Controllers;
 public class DepartmentsController : ApplicationController
 {
     [HttpGet("roots")]
-    public async Task<IActionResult> GetRoots()
+    public async Task<IActionResult> GetRoots(
+        [FromServices] IQueryHandler<GetRootDepartmentsQuery, FilteredListDTO<DepartmentTreeDTO>> handler,
+        [FromQuery] GetRootDepartmentsQuery query,
+        CancellationToken cancellationToken = default)
     {
-        //страницы корней + prefetch детей.
-        return Ok();
+        return ToAPIResponse(await handler.HandleAsync(query, cancellationToken));
     }
 
     [HttpGet("{id:guid}/children")]
-    public async Task<IActionResult> GetChildren()
+    public async Task<IActionResult> GetChildren(
+        [FromServices] IQueryHandler<GetChildrenDepartmentsQuery, FilteredListDTO<DepartmentDTO>> handler,
+        [FromRoute] Guid id,
+        [FromQuery] GetChildrenDepartmentsRequest request,
+        CancellationToken cancellationToken = default)
     {
-        //лениво загружать уровни.
-        return Ok();
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> Get()
-    {
-        //вернуть найденный отдел, предков и поддерево.
-        return Ok();
+        return ToAPIResponse(await handler.HandleAsync(request.ToQuery(id), cancellationToken));
     }
 
     [HttpPost]

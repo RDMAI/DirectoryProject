@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Infrastructure.Database;
+﻿using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using DirectoryProject.DirectoryService.WebAPI.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -63,7 +63,7 @@ public static class DependencyInjection
         {
             await using var scope = app.Services.CreateAsyncScope();
 
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationWriteDBContext>();
             await dbContext.ApplyMigrationsAsync();
 
             app.UseSwagger();

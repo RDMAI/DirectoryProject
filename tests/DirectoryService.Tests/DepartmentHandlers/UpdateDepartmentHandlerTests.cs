@@ -4,6 +4,7 @@ using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
+using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -113,5 +114,108 @@ public class UpdateDepartmentHandlerTests : DirectoryServiceBaseHandlerTests
         Assert.True(
             parentAfterUpdate.ChildrenCount == 1,
             $"New parent's children count is incorrect: expected 1, got {parentAfterUpdate.ChildrenCount}");
+    }
+
+    [Fact]
+    public async Task HandleAsync_TwoConcurrentUpdatesOfDepartmentNameAndParent_MiddleOfTree_ReturnFailureAndSuccess()
+    {
+        // Arrange
+        var location = Location.Create(
+            id: Id<Location>.GenerateNew(),
+            name: LocationName.Create("Moscow location").Value,
+            address: LocationAddress.Create("Moscow", "Lenina", "1").Value,
+            timeZone: IANATimeZone.Create("Europe/Moscow").Value,
+            createdAt: DateTime.UtcNow).Value;
+        _context.Locations.Add(location);
+
+        // modeling whole tree, parents' updates also use optimistic locking
+        var parentRoot = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Root parent").Value,
+            parent: null,
+            createdAt: DateTime.UtcNow).Value;
+        var innerParent = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Parent 2 level").Value,
+            parent: parentRoot,
+            createdAt: DateTime.UtcNow).Value;
+        var parentAfterUpdate = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Parent after update").Value,
+            parent: null,
+            createdAt: DateTime.UtcNow).Value;
+
+        var departmentToUpdate = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Department Before Update").Value,
+            parent: innerParent,
+            createdAt: DateTime.UtcNow).Value;
+
+        var child1 = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Child 1").Value,
+            parent: departmentToUpdate,
+            createdAt: DateTime.UtcNow).Value;
+        var child2 = Department.Create(
+            id: Id<Department>.GenerateNew(),
+            name: DepartmentName.Create("Child 2").Value,
+            parent: departmentToUpdate,
+            createdAt: DateTime.UtcNow).Value;
+
+        _context.Departments.AddRange([
+            parentRoot,
+            innerParent,
+            parentAfterUpdate,
+            departmentToUpdate,
+            child1,
+            child2]);
+
+        _context.DepartmentLocations.AddRange([
+            new DepartmentLocation(parentRoot.Id, location.Id),
+            new DepartmentLocation(innerParent.Id, location.Id),
+            new DepartmentLocation(parentAfterUpdate.Id, location.Id),
+            new DepartmentLocation(departmentToUpdate.Id, location.Id),
+            new DepartmentLocation(child1.Id, location.Id),
+            new DepartmentLocation(child2.Id, location.Id),
+            ]);
+
+        await _context.SaveChangesAsync();
+
+        var ct = new CancellationTokenSource().Token;
+
+        var command1 = new UpdateDepartmentCommand(
+            Id: departmentToUpdate.Id.Value,
+            Name: $"Department After Update 1",
+            LocationIds: [location.Id.Value],
+            ParentId: parentAfterUpdate.Id.Value);
+        var command2 = new UpdateDepartmentCommand(
+            Id: departmentToUpdate.Id.Value,
+            Name: $"Department After Update 2",
+            LocationIds: [location.Id.Value],
+            ParentId: parentAfterUpdate.Id.Value);
+
+        using var scope2 = _webFactory.Services.CreateScope();
+        var sut2 = scope2.ServiceProvider
+            .GetRequiredService<ICommandHandler<UpdateDepartmentCommand, DepartmentDTO>>();
+
+        // Act
+        var results = await Task.WhenAll([
+            _sut.HandleAsync(command1, ct),
+            sut2.HandleAsync(command2, ct)
+            ]);
+
+        // Assert
+        var failedResult = results.FirstOrDefault(d => d.IsFailure);
+        var succededResult = results.FirstOrDefault(d => d.IsSuccess);
+
+        Assert.True(
+            failedResult is not null,
+            "Both concurrent updates succeded, expected otherwise");
+        Assert.True(
+            succededResult is not null,
+            "Both concurrent updates failed, expected otherwise");
+        Assert.True(
+            failedResult.Errors.First().Type == ErrorType.Conflict,
+            "Both concurrent updates succeded, expected otherwise");
     }
 }

@@ -1,8 +1,9 @@
 ﻿using DirectoryProject.DirectoryService.Domain.Shared;
+using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 
 namespace DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 
-public class LocationAddress : IComparable<LocationAddress>
+public class LocationAddress : IComparable<LocationAddress>, IEquatable<LocationAddress>
 {
     public const int CITY_MAX_LENGTH = 100;
     public const int STREET_MAX_LENGTH = 100;
@@ -35,6 +36,20 @@ public class LocationAddress : IComparable<LocationAddress>
         if (other is null) throw new ArgumentNullException(nameof(other));
 
         return City == other.City && Street == other.Street && HouseNumber == other.HouseNumber ? 0 : -1;
+    }
+
+    public bool Equals(LocationAddress? other)
+    {
+        if (other is null)
+            return false;
+        return City == other.City && Street == other.Street && HouseNumber == other.HouseNumber;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is LocationAddress other)
+            return Equals(other);
+        return false;
     }
 
     private LocationAddress(

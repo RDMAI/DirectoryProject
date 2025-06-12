@@ -5,7 +5,7 @@ using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Configurations;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Configurations;
 
 public class PositionConfiguration : IEntityTypeConfiguration<Position>
 {
@@ -43,6 +43,11 @@ public class PositionConfiguration : IEntityTypeConfiguration<Position>
             .IsRequired(false)
             .HasMaxLength(PositionDescription.MAX_LENGTH)
             .HasColumnName("description");
+
+        builder.HasMany(d => d.DepartmentPositions)
+            .WithOne(dp => dp.Position)
+            .HasForeignKey(dp => dp.PositionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(d => d.CreatedAt)
             .HasConversion(

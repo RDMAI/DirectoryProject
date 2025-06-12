@@ -4,4 +4,5 @@ namespace DirectoryProject.DirectoryService.Application.PositionHandlers.CreateP
 
 public record CreatePositionCommand(
     string Name,
-    string Description) : ICommand;
+    string Description,
+    IEnumerable<Guid> DepartmentIds) : ICommand;

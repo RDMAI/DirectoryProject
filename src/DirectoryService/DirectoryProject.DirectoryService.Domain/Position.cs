@@ -13,6 +13,9 @@ public class Position
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; private set; }
 
+    private List<DepartmentPosition> _departmentPositions = [];
+    public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
+
     public static Result<Position> Create(
         Id<Position> id,
         PositionName name,
@@ -33,6 +36,14 @@ public class Position
         Name = name;
         Description = description;
         UpdatedAt = DateTime.UtcNow;
+
+        return this;
+    }
+
+    public Position UpdateDepartments(
+        IEnumerable<Id<Department>> departmentIds)
+    {
+        _departmentPositions = departmentIds.Select(did => new DepartmentPosition(did, Id)).ToList();
 
         return this;
     }

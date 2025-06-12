@@ -5,13 +5,13 @@ using DirectoryProject.DirectoryService.Domain.Shared;
 using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
-namespace DirectoryProject.DirectoryService.Infrastructure.Database.Repositories;
+namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 
 public class PositionRepository : IPositionRepository
 {
-    private readonly ApplicationDBContext _context;
+    private readonly ApplicationWriteDBContext _context;
 
-    public PositionRepository(ApplicationDBContext context)
+    public PositionRepository(ApplicationWriteDBContext context)
     {
         _context = context;
     }
@@ -50,8 +50,21 @@ public class PositionRepository : IPositionRepository
 
     public async Task<Result<Position>> UpdateAsync(
         Position entity,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IEnumerable<DepartmentPosition>? oldDepartmentPositions = null)
     {
+        // sync DepartmentPositions
+        if (oldDepartmentPositions is not null)
+        {
+            foreach (var item in oldDepartmentPositions)
+            {
+                var found = entity.DepartmentPositions
+                    .FirstOrDefault(d => d.PositionId == item.PositionId);
+                if (found is null)
+                    _context.DepartmentPositions.Remove(item);
+            }
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return entity;
