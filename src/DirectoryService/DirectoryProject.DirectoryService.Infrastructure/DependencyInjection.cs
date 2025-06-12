@@ -4,6 +4,8 @@ using DirectoryProject.DirectoryService.Infrastructure.BackgroundServices;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseRead;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
+using DirectoryProject.DirectoryService.Infrastructure.Intefraces;
+using DirectoryProject.DirectoryService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +32,9 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork, DirectoryServiceUnitOfWork>();
 
-        var configs = configuration.GetSection("SoftDeleteCleaner");
+        services.AddSingleton<IDatabaseCleanerService, DatabaseCleanerService>();
 
+        var configs = configuration.GetSection("SoftDeleteCleaner");
         services.Configure<SoftDeleteCleanerOptions>(configs);
         services.AddHostedService<SoftDeleteCleanerBackgroundService>();
 
