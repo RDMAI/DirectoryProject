@@ -16,20 +16,6 @@ public class GetLocationsHandler
     private readonly ILogger<GetLocationsHandler> _logger;
     private readonly IDBConnectionFactory _connectionFactory;
 
-    private const string COUNT_SQL_QUERY =
-        """
-        SELECT count(id)
-        FROM diretory_service.locations
-        WHERE is_active = true
-        """;
-
-    private const string SELECT_SQL_QUERY =
-        """
-        SELECT id, name, address, time_zone
-        FROM diretory_service.locations
-        WHERE is_active = true
-        """;
-
     public GetLocationsHandler(
         AbstractValidator<GetLocationsQuery> validator,
         ILogger<GetLocationsHandler> logger,
@@ -55,7 +41,12 @@ public class GetLocationsHandler
 
         using var connection = _connectionFactory.Create();
 
-        var totalCountBuilder = new CustomSQLBuilder(COUNT_SQL_QUERY);
+        var totalCountBuilder = new CustomSQLBuilder(
+            """
+            SELECT count(id)
+            FROM diretory_service.locations
+            WHERE is_active = true
+            """);
         if (string.IsNullOrEmpty(query.Search) == false)
         {
             totalCountBuilder.Append(" AND");
@@ -67,7 +58,12 @@ public class GetLocationsHandler
             _logger,
             cancellationToken);
 
-        var selectBuilder = new CustomSQLBuilder(SELECT_SQL_QUERY);
+        var selectBuilder = new CustomSQLBuilder(
+            """
+            SELECT id, name, address, time_zone
+            FROM diretory_service.locations
+            WHERE is_active = true
+            """);
         if (string.IsNullOrEmpty(query.Search) == false)
         {
             selectBuilder.Append(" AND");

@@ -16,33 +16,6 @@ public class GetRootDepartmentsHandler
     private readonly ILogger<GetRootDepartmentsHandler> _logger;
     private readonly IDBConnectionFactory _connectionFactory;
 
-    private const string COUNT_SQL_QUERY =
-        """
-        SELECT count(id)
-        FROM diretory_service.departments
-        WHERE is_active = true AND depth = 0
-        """;
-
-    private const string MULTIPLE_SELECT_SQL_QUERY =
-        """
-        SELECT id, name, parent_id, path, depth, children_count
-        FROM diretory_service.departments
-        WHERE is_active = true AND depth = 0
-        ORDER BY name
-        LIMIT @limit OFFSET @offset;
-
-        SELECT *
-        FROM (SELECT
-            id, name, parent_id, path, depth, children_count,
-            ROW_NUMBER () OVER (
-                PARTITION BY parent_id
-                ORDER BY name)
-                AS r_number
-            FROM diretory_service.departments
-            WHERE is_active = true AND depth = 1)
-        WHERE r_number <= @prefetch;
-        """;
-
     public GetRootDepartmentsHandler(
         AbstractValidator<GetRootDepartmentsQuery> validator,
         ILogger<GetRootDepartmentsHandler> logger,
@@ -68,14 +41,37 @@ public class GetRootDepartmentsHandler
 
         using var connection = _connectionFactory.Create();
 
-        var totalCountBuilder = new CustomSQLBuilder(COUNT_SQL_QUERY);
+        var totalCountBuilder = new CustomSQLBuilder(
+            """
+            SELECT count(id)
+            FROM diretory_service.departments
+            WHERE is_active = true AND depth = 0
+            """);
 
         var totalCount = await connection.ExecuteScalarAsync<int>(
             totalCountBuilder,
             _logger,
             cancellationToken);
 
-        var multipleSelectBuilder = new CustomSQLBuilder(MULTIPLE_SELECT_SQL_QUERY);
+        var multipleSelectBuilder = new CustomSQLBuilder(
+            """
+            SELECT id, name, parent_id, path, depth, children_count
+            FROM diretory_service.departments
+            WHERE is_active = true AND depth = 0
+            ORDER BY name
+            LIMIT @limit OFFSET @offset;
+
+            SELECT *
+            FROM (SELECT
+                id, name, parent_id, path, depth, children_count,
+                ROW_NUMBER () OVER (
+                    PARTITION BY parent_id
+                    ORDER BY name)
+                    AS r_number
+                FROM diretory_service.departments
+                WHERE is_active = true AND depth = 1)
+            WHERE r_number <= @prefetch;
+            """);
         multipleSelectBuilder.Parameters.Add("@offset", (query.Page - 1) * query.Size);
         multipleSelectBuilder.Parameters.Add("@limit", query.Size);
         multipleSelectBuilder.Parameters.Add("@prefetch", query.Prefetch);

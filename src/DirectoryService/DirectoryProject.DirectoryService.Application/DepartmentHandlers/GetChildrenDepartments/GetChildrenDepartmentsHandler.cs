@@ -1,16 +1,10 @@
-﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
-using DirectoryProject.DirectoryService.Application.Shared.Database;
+﻿using DirectoryProject.DirectoryService.Application.Shared.Database;
 using DirectoryProject.DirectoryService.Application.Shared.DTOs;
 using DirectoryProject.DirectoryService.Application.Shared.Extensions;
 using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Domain.Shared;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetChildrenDepartments;
 
@@ -20,20 +14,6 @@ public class GetChildrenDepartmentsHandler
     private readonly AbstractValidator<GetChildrenDepartmentsQuery> _validator;
     private readonly ILogger<GetChildrenDepartmentsHandler> _logger;
     private readonly IDBConnectionFactory _connectionFactory;
-
-    private const string COUNT_SQL_QUERY =
-        """
-        SELECT count(id)
-        FROM diretory_service.departments
-        WHERE is_active = true AND parent_id = @parent_id
-        """;
-
-    private const string SELECT_SQL_QUERY =
-        """
-        SELECT id, name, parent_id, path, depth, children_count
-        FROM diretory_service.departments
-        WHERE is_active = true AND parent_id = @parent_id
-        """;
 
     public GetChildrenDepartmentsHandler(
         AbstractValidator<GetChildrenDepartmentsQuery> validator,
@@ -60,7 +40,12 @@ public class GetChildrenDepartmentsHandler
 
         using var connection = _connectionFactory.Create();
 
-        var totalCountBuilder = new CustomSQLBuilder(COUNT_SQL_QUERY);
+        var totalCountBuilder = new CustomSQLBuilder(
+            """
+            SELECT count(id)
+            FROM diretory_service.departments
+            WHERE is_active = true AND parent_id = @parent_id
+            """);
         totalCountBuilder.Parameters.Add("@parent_id", query.ParentId);
 
         var totalCount = await connection.ExecuteScalarAsync<int>(
@@ -68,7 +53,12 @@ public class GetChildrenDepartmentsHandler
             _logger,
             cancellationToken);
 
-        var selectBuilder = new CustomSQLBuilder(SELECT_SQL_QUERY);
+        var selectBuilder = new CustomSQLBuilder(
+            """
+            SELECT id, name, parent_id, path, depth, children_count
+            FROM diretory_service.departments
+            WHERE is_active = true AND parent_id = @parent_id
+            """);
         selectBuilder.Parameters.Add("@parent_id", query.ParentId);
 
         selectBuilder.ApplySorting(new Dictionary<string, bool> {

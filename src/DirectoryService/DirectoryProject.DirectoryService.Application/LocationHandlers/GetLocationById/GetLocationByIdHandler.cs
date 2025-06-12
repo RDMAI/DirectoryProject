@@ -15,13 +15,6 @@ public class GetLocationByIdHandler
     private readonly ILogger<GetLocationByIdHandler> _logger;
     private readonly IDBConnectionFactory _connectionFactory;
 
-    private const string SQLQUERY =
-        """
-        SELECT id, name, address, time_zone
-        FROM diretory_service.locations
-        WHERE id = @id and is_active = true
-        """;
-
     public GetLocationByIdHandler(
         AbstractValidator<GetLocationByIdQuery> validator,
         ILogger<GetLocationByIdHandler> logger,
@@ -51,7 +44,11 @@ public class GetLocationByIdHandler
         using var connection = _connectionFactory.Create();
 
         var result = await connection.QueryFirstOrDefaultAsync<LocationDTO>(new CommandDefinition(
-            commandText: SQLQUERY,
+            commandText: """
+                SELECT id, name, address, time_zone
+                FROM diretory_service.locations
+                WHERE id = @id and is_active = true
+                """,
             parameters: parameters,
             cancellationToken: cancellationToken));
         if (result is null)
