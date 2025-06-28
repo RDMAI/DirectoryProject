@@ -7,12 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DirectoryProject.DirectoryService.Domain\DirectoryProject.DirectoryService.Domain.csproj" />
+    <PackageReference Include="Core" Version="1.0.6" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <ProjectReference Include="..\DirectoryProject.DirectoryService.Domain\DirectoryProject.DirectoryService.Domain.csproj" />
   </ItemGroup>
 
 </Project>

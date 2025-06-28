@@ -1,6 +1,6 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.Validation;
+﻿using Core.Validation;
 using DirectoryProject.DirectoryService.Domain.PositionValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
+using SharedKernel;
 using FluentValidation;
 
 namespace DirectoryProject.DirectoryService.Application.PositionHandlers.CreatePosition;

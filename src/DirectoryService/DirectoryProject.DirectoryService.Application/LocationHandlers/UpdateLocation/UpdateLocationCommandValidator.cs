@@ -1,8 +1,8 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Validation;
+﻿using Core.Validation;
+using DirectoryProject.DirectoryService.Application.DTOs;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
 using FluentValidation;
+using SharedKernel;
 
 namespace DirectoryProject.DirectoryService.Application.LocationHandlers.UpdateLocation;
 internal class UpdateLocationCommandValidator : AbstractValidator<UpdateLocationCommand>

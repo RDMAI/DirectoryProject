@@ -1,7 +1,7 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Validation;
+﻿using Core.Validation;
+using DirectoryProject.DirectoryService.Application.DTOs;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
+using SharedKernel;
 using FluentValidation;
 
 namespace DirectoryProject.DirectoryService.Application.LocationHandlers.CreateLocation;

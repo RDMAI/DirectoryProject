@@ -1,9 +1,10 @@
-﻿using DirectoryProject.DirectoryService.Application.PositionHandlers.CreatePosition;
+﻿using Core.Abstractions;
+using DirectoryProject.DirectoryService.Application.DTOs;
+using DirectoryProject.DirectoryService.Application.PositionHandlers.CreatePosition;
 using DirectoryProject.DirectoryService.Application.PositionHandlers.SoftDeletePosition;
 using DirectoryProject.DirectoryService.Application.PositionHandlers.UpdatePosition;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.WebAPI.Requests;
+using Framework;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Controllers;

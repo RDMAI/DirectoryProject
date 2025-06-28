@@ -1,17 +1,11 @@
-﻿using DirectoryProject.DirectoryService.Application.Interfaces;
-using DirectoryProject.DirectoryService.Application.LocationHandlers.SoftDeleteLocation;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+﻿using Core.Abstractions;
+using Core.Database;
+using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
-using DirectoryProject.DirectoryService.Domain.Shared;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using SharedKernel;
+using SharedKernel.ValueObjects;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DirectoryProject.DirectoryService.Application.PositionHandlers.SoftDeletePosition;
 

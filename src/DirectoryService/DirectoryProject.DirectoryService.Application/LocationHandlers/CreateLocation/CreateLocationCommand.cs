@@ -1,5 +1,5 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+﻿using Core.Abstractions;
+using DirectoryProject.DirectoryService.Application.DTOs;
 
 namespace DirectoryProject.DirectoryService.Application.LocationHandlers.CreateLocation;
 

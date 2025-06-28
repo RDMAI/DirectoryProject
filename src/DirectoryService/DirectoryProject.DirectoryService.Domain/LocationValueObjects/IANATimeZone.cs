@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Domain.Shared;
+﻿using SharedKernel;
 using NodaTime;
 
 namespace DirectoryProject.DirectoryService.Domain.LocationValueObjects;

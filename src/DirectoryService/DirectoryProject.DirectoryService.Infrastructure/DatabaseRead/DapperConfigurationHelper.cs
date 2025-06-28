@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Text.Json;
 using Dapper;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
+using DirectoryProject.DirectoryService.Application.DTOs;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseRead;
 

@@ -1,9 +1,7 @@
 ﻿using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
-using DirectoryProject.DirectoryService.WebAPI.Middlewares;
+using Framework.Logging;
+using Framework.Middlewares;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using Serilog;
-using Serilog.Events;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Extensions;
 
@@ -32,28 +30,6 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddAPILogging(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console()
-            .WriteTo.Debug()
-            .WriteTo.Seq(configuration.GetConnectionString("Seq")
-                ?? throw new ArgumentNullException("Seq"))
-            .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
-            .CreateLogger();
-
-        // to watch serilogs inner errors
-        Serilog.Debugging.SelfLog.Enable(Console.Error);
-
-        services.AddSerilog();
-
-        return services;
-    }
-
     public static async Task<WebApplication> ConfigureAsync(this WebApplication app)
     {
         app.UseMiddleware<ExceptionMiddleware>();
@@ -70,7 +46,7 @@ public static class DependencyInjection
             app.UseSwaggerUI();
         }
 
-        app.UseSerilogRequestLogging();
+        app.UseAPILogging();
 
         app.UseHttpsRedirection();
 

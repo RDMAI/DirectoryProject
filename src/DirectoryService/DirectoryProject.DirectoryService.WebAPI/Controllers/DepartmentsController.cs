@@ -1,11 +1,12 @@
-﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
+﻿using Core.Abstractions;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetChildrenDepartments;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDeleteDepartment;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+using DirectoryProject.DirectoryService.Application.DTOs;
 using DirectoryProject.DirectoryService.WebAPI.Requests;
+using Framework;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Controllers;

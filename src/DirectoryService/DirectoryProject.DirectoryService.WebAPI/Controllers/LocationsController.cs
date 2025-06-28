@@ -1,13 +1,13 @@
-﻿using DirectoryProject.DirectoryService.Application.LocationHandlers.CreateLocation;
+﻿using Core.Abstractions;
+using DirectoryProject.DirectoryService.Application.DTOs;
+using DirectoryProject.DirectoryService.Application.LocationHandlers.CreateLocation;
 using DirectoryProject.DirectoryService.Application.LocationHandlers.GetLocationById;
 using DirectoryProject.DirectoryService.Application.LocationHandlers.GetLocations;
 using DirectoryProject.DirectoryService.Application.LocationHandlers.SoftDeleteLocation;
 using DirectoryProject.DirectoryService.Application.LocationHandlers.UpdateLocation;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.WebAPI.Requests;
+using Framework;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Controllers;
 

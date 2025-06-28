@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+﻿using SharedKernel.ValueObjects;
 
 namespace DirectoryProject.DirectoryService.Domain;
 

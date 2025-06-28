@@ -1,6 +1,6 @@
-﻿using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
-using DirectoryProject.DirectoryService.Application.Shared.Validation;
-using DirectoryProject.DirectoryService.Domain.Shared;
+﻿using Core.Validation;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
+using SharedKernel;
 using FluentValidation;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetChildrenDepartments;

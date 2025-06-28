@@ -26,9 +26,6 @@ public class SoftDeleteCleanerBackgroundService : BackgroundService
             _checkPeriod = TimeSpan.FromHours(options.Value.CheckPeriodHours);
             _timeToRestore = TimeSpan.FromHours(options.Value.TimeToRestoreHours);
         }
-
-        _checkPeriod = TimeSpan.FromSeconds(10);
-        _timeToRestore = TimeSpan.FromSeconds(10);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
