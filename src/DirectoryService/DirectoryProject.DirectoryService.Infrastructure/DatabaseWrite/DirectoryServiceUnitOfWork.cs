@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+using Core.Database;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;

@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using SharedKernel;
+using SharedKernel.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryProject.DirectoryService.Domain;

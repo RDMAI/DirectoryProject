@@ -1,7 +1,4 @@
-﻿using System.Data;
-using DirectoryProject.DirectoryService.Domain.Shared;
-
-namespace DirectoryProject.DirectoryService.Infrastructure.Intefraces;
+﻿namespace DirectoryProject.DirectoryService.Infrastructure.Intefraces;
 
 public interface IDatabaseCleanerService
 {

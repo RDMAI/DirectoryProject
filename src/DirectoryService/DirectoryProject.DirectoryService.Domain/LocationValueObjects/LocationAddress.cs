@@ -1,5 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Domain.Shared;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+﻿using SharedKernel;
 
 namespace DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 

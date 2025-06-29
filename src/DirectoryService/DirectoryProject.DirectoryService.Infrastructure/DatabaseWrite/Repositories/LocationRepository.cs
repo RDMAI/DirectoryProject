@@ -1,11 +1,9 @@
 ﻿using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
-using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
+using SharedKernel;
+using SharedKernel.ValueObjects;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite.Repositories;
 

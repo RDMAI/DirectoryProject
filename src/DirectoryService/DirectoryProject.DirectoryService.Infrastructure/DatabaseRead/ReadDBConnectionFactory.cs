@@ -1,6 +1,6 @@
-﻿using System.Data;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+﻿using Core.Database;
 using Npgsql;
+using System.Data;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseRead;
 

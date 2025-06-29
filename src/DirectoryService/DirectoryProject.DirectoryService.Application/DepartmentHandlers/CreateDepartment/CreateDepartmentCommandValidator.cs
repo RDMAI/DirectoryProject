@@ -1,7 +1,6 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.Validation;
+﻿using Core.Validation;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
-using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
+using SharedKernel;
 using FluentValidation;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;

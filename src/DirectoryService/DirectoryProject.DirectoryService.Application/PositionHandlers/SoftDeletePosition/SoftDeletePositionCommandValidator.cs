@@ -1,5 +1,5 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.Validation;
-using DirectoryProject.DirectoryService.Domain.Shared;
+﻿using Core.Validation;
+using SharedKernel;
 using FluentValidation;
 
 namespace DirectoryProject.DirectoryService.Application.PositionHandlers.SoftDeletePosition;

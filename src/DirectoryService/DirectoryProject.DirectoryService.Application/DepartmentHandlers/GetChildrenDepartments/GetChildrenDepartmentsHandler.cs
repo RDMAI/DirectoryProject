@@ -1,8 +1,7 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.Database;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
-using DirectoryProject.DirectoryService.Application.Shared.Extensions;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
-using DirectoryProject.DirectoryService.Domain.Shared;
+﻿using Core.Abstractions;
+using Core.Database;
+using DirectoryProject.DirectoryService.Application.DTOs;
+using SharedKernel;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 

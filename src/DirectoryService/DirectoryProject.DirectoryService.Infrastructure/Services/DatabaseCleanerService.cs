@@ -1,7 +1,7 @@
 ﻿using System.Data;
+using Core.Database;
 using Dapper;
 using DirectoryProject.DirectoryService.Application.Interfaces;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using DirectoryProject.DirectoryService.Infrastructure.Intefraces;
 using Microsoft.EntityFrameworkCore;

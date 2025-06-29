@@ -1,6 +1,6 @@
 ﻿using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using SharedKernel.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

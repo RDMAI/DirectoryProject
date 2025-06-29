@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+﻿using Core.Abstractions;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
 

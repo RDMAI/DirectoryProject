@@ -1,5 +1,5 @@
-﻿using DirectoryProject.DirectoryService.Application.LocationHandlers.UpdateLocation;
-using DirectoryProject.DirectoryService.Application.Shared.DTOs;
+﻿using DirectoryProject.DirectoryService.Application.DTOs;
+using DirectoryProject.DirectoryService.Application.LocationHandlers.UpdateLocation;
 
 namespace DirectoryProject.DirectoryService.WebAPI.Requests;
 

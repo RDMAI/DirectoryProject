@@ -1,4 +1,4 @@
-﻿using DirectoryProject.DirectoryService.Domain.Shared;
+﻿using SharedKernel;
 
 namespace DirectoryProject.DirectoryService.Domain.PositionValueObjects;
 

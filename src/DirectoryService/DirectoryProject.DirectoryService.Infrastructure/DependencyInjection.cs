@@ -1,5 +1,5 @@
-﻿using DirectoryProject.DirectoryService.Application.Interfaces;
-using DirectoryProject.DirectoryService.Application.Shared.Interfaces;
+﻿using Core.Database;
+using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Infrastructure.BackgroundServices;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseRead;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;

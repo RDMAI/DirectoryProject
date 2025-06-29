@@ -1,8 +1,7 @@
 ﻿using DirectoryProject.DirectoryService.Domain;
-using DirectoryProject.DirectoryService.Domain.LocationValueObjects;
 using DirectoryProject.DirectoryService.Domain.PositionValueObjects;
-using DirectoryProject.DirectoryService.Domain.Shared;
-using DirectoryProject.DirectoryService.Domain.Shared.ValueObjects;
+using SharedKernel;
+using SharedKernel.ValueObjects;
 
 namespace DirectoryProject.DirectoryService.Application.Interfaces;
 
