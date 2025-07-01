@@ -1,5 +1,5 @@
 ﻿namespace DirectoryProject.FileService.WebAPI.Features;
 
-public class MultipartCancelUpload
+public sealed class MultipartCancelUpload
 {
 }

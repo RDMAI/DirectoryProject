@@ -1,5 +1,7 @@
-﻿namespace DirectoryProject.FileService.WebAPI.Features;
+﻿using Framework.Endpoints;
 
-public class DeleteFile
+namespace DirectoryProject.FileService.WebAPI.Features;
+
+public sealed class DeleteFile
 {
 }

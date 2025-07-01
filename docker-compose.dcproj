@@ -10,6 +10,7 @@
     <DockerServiceName>directoryproject.directoryservice.webapi</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include=".env" />
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>

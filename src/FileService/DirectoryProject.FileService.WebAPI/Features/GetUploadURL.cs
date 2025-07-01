@@ -1,5 +1,5 @@
 ﻿namespace DirectoryProject.FileService.WebAPI.Features;
 
-public class GetUploadURL
+public sealed class GetUploadURL
 {
 }

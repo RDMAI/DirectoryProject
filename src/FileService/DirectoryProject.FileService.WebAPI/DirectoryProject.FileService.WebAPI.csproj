@@ -4,18 +4,17 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>32fde7b4-d3e8-49b8-9272-2eafb031fabf</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="4.0.3.1" />
     <PackageReference Include="Core" Version="1.0.6" />
     <PackageReference Include="Framework" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.15" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.6" />
     <PackageReference Include="SharedKernel" Version="1.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Domain\" />
   </ItemGroup>
 
 </Project>
