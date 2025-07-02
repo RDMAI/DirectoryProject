@@ -1,6 +1,8 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using DirectoryProject.FileService.WebAPI.Domain;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.Extensions.Options;
 
 namespace DirectoryProject.FileService.WebAPI.FileManagement;
 
@@ -14,15 +16,15 @@ public class S3Provider : IS3Provider
 
     public S3Provider(
         IAmazonS3 s3,
-        S3Options options,
+        IOptions<S3Options> options,
         ILogger<S3Provider> logger)
     {
         _s3 = s3;
-        _options = options;
+        _options = options.Value;
         _logger = logger;
     }
 
-    public async Task<string> StartMultipartUpload(
+    public async Task<string> StartMultipartUploadAsync(
         string fileName,
         string contentType,
         FileLocation location,
@@ -81,7 +83,7 @@ public class S3Provider : IS3Provider
         return response.Key;
     }
 
-    public async Task<IReadOnlyList<string>> GenerateAllChunkUploadUrls(
+    public async Task<IReadOnlyList<string>> GenerateAllChunkUploadUrlsAsync(
         FileLocation location,
         string uploadId,
         int totalChunks)
@@ -112,7 +114,7 @@ public class S3Provider : IS3Provider
         return presignedURLs;
     }
 
-    public async Task<string> GenerateChunkUploadUrl(
+    public async Task<string> GenerateChunkUploadUrlAsync(
         FileLocation location,
         string uploadId,
         int partNumber)
@@ -152,7 +154,7 @@ public class S3Provider : IS3Provider
         return location.FileId;
     }
 
-    public async Task<string> GenerateUploadUrl(
+    public async Task<string> GenerateUploadUrlAsync(
         string fileName,
         FileLocation location,
         CancellationToken ct = default)
@@ -176,23 +178,31 @@ public class S3Provider : IS3Provider
         return response;
     }
 
-    public async Task<string> GenerateDownloadUrlAsync(
-        FileLocation location,
-        int expirationHours)
+    public async Task<List<FileURL>> GenerateDownloadUrlsAsync(
+        List<FileLocation> locations)
     {
         var request = new GetPreSignedUrlRequest
         {
-            BucketName = location.BucketName,
-            Key = location.FileId,
             Verb = HttpVerb.GET,  // download
-            Expires = DateTime.UtcNow.AddHours(expirationHours),
+            Expires = DateTime.UtcNow.AddHours(_options.URLExpirationDays),
         };
 
-        var response = await _s3.GetPreSignedURLAsync(request);
+        List<FileURL> result = [];
 
-        _logger.LogInformation("Created download presigned URL. File id {fileId}", location.FileId);
+        foreach (var location in locations)
+        {
+            request.BucketName = location.BucketName;
+            request.Key = location.FileId;
 
-        return response;
+            var url = await _s3.GetPreSignedURLAsync(request);
+            result.Add(new FileURL(
+                FileId: location.FileId,
+                Url: url));
+
+            _logger.LogInformation("Created download presigned URL. File id {fileId}", location.FileId);
+        }
+
+        return result;
     }
 
     public async Task<List<string>> ListBucketsAsync(CancellationToken ct = default)

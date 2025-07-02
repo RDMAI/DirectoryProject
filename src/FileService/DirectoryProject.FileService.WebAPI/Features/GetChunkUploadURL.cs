@@ -7,40 +7,45 @@ using SharedKernel;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
-public sealed class GetDownloadURLs
+public sealed class GetChunkUploadURL
 {
     public class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/files/urls", Handler);
+            app.MapPost("/api/files/multipart/url", Handler);
         }
     }
 
-    public record GetDownloadURLsRequest(
-        List<FileLocation> Locations);
+    public record GetChunkUploadURLRequest(
+        FileLocation Location,
+        string UploadId,
+        int PartNumber);
 
-    public record GetDownloadURLsResponse(
-        List<FileURL> URLs);
+    public record GetChunkUploadURLResponse(
+        string URL,
+        int PartNumber);
 
     public static async Task<IActionResult> Handler(
-        GetDownloadURLsRequest request,
+        GetChunkUploadURLRequest request,
         IS3Provider s3Provider,
         CancellationToken ct = default)
     {
-        if (request.Locations.Count > 0)
+        if (request.PartNumber > 0)
         {
             var error = ErrorHelper.General.ValueIsNullOrEmpty(
-                    nameof(GetDownloadURLsRequest.Locations));
+                    nameof(GetChunkUploadURLRequest.PartNumber));
 
             return APIResponseHelper.ToAPIResponse(error);
         }
 
-        var urls = await s3Provider.GenerateDownloadUrlsAsync(
-            locations: request.Locations);
+        var url = await s3Provider.GenerateChunkUploadUrlAsync(
+            location: request.Location,
+            uploadId: request.UploadId,
+            partNumber: request.PartNumber);
 
         var output = Result.Success(
-            new GetDownloadURLsResponse(urls));
+            new GetChunkUploadURLResponse(url, request.PartNumber));
 
         return APIResponseHelper.ToAPIResponse(output);
     }

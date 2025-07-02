@@ -1,3 +1,3 @@
 ﻿namespace DirectoryProject.FileService.WebAPI.Domain;
 
-public record FileUrl(string FileId, string Url);
+public record FileURL(string FileId, string Url);

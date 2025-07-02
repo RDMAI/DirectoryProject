@@ -4,7 +4,7 @@ namespace DirectoryProject.FileService.WebAPI.FileManagement;
 
 public interface IS3Provider
 {
-    Task<string> StartMultipartUpload(
+    Task<string> StartMultipartUploadAsync(
         string fileName,
         string contentType,
         FileLocation location,
@@ -18,11 +18,11 @@ public interface IS3Provider
         string uploadId,
         List<PartETagModel> partETags,
         CancellationToken ct = default);
-    Task<IReadOnlyList<string>> GenerateAllChunkUploadUrls(
+    Task<IReadOnlyList<string>> GenerateAllChunkUploadUrlsAsync(
         FileLocation location,
         string uploadId,
         int totalChunks);
-    Task<string> GenerateChunkUploadUrl(
+    Task<string> GenerateChunkUploadUrlAsync(
         FileLocation location,
         string uploadId,
         int partNumber);
@@ -30,13 +30,12 @@ public interface IS3Provider
     Task<string> DeleteFileAsync(
         FileLocation location,
         CancellationToken ct = default);
-    Task<string> GenerateUploadUrl(
+    Task<string> GenerateUploadUrlAsync(
         string fileName,
         FileLocation location,
         CancellationToken ct = default);
-    Task<string> GenerateDownloadUrlAsync(
-        FileLocation location,
-        int expirationHours);
+    Task<List<FileURL>> GenerateDownloadUrlsAsync(
+        List<FileLocation> locations);
 
     Task<List<string>> ListBucketsAsync(CancellationToken ct = default);
 }

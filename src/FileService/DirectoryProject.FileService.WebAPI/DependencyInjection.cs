@@ -48,6 +48,9 @@ public static class DependencyInjection
             return new AmazonS3Client(s3Options.AccessKey, s3Options.SecretKey, config);
         });
 
+        // cors
+        services.AddCors();
+
         return services;
     }
 
@@ -68,6 +71,11 @@ public static class DependencyInjection
         app.UseAPILogging();
 
         app.UseHttpsRedirection();
+
+        app.UseCors(builder =>
+        {
+            builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+        });
 
         app.MapEndpoints();
 

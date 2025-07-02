@@ -42,6 +42,12 @@ public record Result<TValue>
     }
 }
 
+public static class Result
+{
+    public static Result<TValue> Success<TValue>(TValue value)
+        => Result<TValue>.Success(value);
+}
+
 public record UnitResult
 {
     public bool IsSuccess { get; private set; } = false;
