@@ -1,10 +1,7 @@
-﻿using Amazon.S3.Model;
-using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Requests;
+using DirectoryProject.FileService.Contracts.Responses;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
-using Framework.Helpers;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
@@ -18,26 +15,13 @@ public sealed class MultipartCompleteUpload
         }
     }
 
-    public record CompleteMultipartUploadRequest(
-        FileLocation Location,
-        string UploadId,
-        List<PartETagModel> PartETags);
-
-    public record CompleteMultipartUploadResponse(
-        string Key);
-
-    public static async Task<IActionResult> Handler(
+    public static async Task<IResult> Handler(
         CompleteMultipartUploadRequest request,
         IS3Provider s3Provider,
         CancellationToken ct = default)
     {
         if (request.PartETags.Count == 0)
-        {
-            var error = ErrorHelper.General.ValueIsNullOrEmpty(
-                    nameof(CompleteMultipartUploadRequest.PartETags));
-
-            return APIResponseHelper.ToAPIResponse(error);
-        }
+            return Results.BadRequest("PartETags list is empty");
 
         var key = await s3Provider.CompleteMultipartUploadAsync(
             location: request.Location,
@@ -45,9 +29,6 @@ public sealed class MultipartCompleteUpload
             partETags: request.PartETags,
             ct: ct);
 
-        var output = Result.Success(
-            new CompleteMultipartUploadResponse(key));
-
-        return APIResponseHelper.ToAPIResponse(output);
+        return Results.Ok(new CompleteMultipartUploadResponse(key));
     }
 }

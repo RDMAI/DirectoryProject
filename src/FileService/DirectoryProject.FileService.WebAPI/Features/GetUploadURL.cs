@@ -1,9 +1,8 @@
-﻿using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Dto;
+using DirectoryProject.FileService.Contracts.Requests;
+using DirectoryProject.FileService.Contracts.Responses;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
-using Framework.Helpers;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
@@ -17,14 +16,7 @@ public sealed class GetUploadURL
         }
     }
 
-    public record GetUploadUrlRequest(
-        string BucketName,
-        string FileName);
-
-    public record GetUploadUrlResponse(
-        FileURL URL);
-
-    public static async Task<IActionResult> Handler(
+    public static async Task<IResult> Handler(
         GetUploadUrlRequest request,
         IS3Provider s3Provider,
         CancellationToken ct = default)
@@ -36,8 +28,8 @@ public sealed class GetUploadURL
             location: new FileLocation(key, request.BucketName),
             ct: ct);
 
-        var output = Result.Success(new FileURL(key, url));
+        var fileUrl = new FileURL(key, url);
 
-        return APIResponseHelper.ToAPIResponse(output);
+        return Results.Ok(new GetUploadUrlResponse(fileUrl));
     }
 }

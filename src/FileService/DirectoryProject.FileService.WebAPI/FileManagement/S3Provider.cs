@@ -1,7 +1,6 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using DirectoryProject.FileService.WebAPI.Domain;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using DirectoryProject.FileService.Contracts.Dto;
 using Microsoft.Extensions.Options;
 
 namespace DirectoryProject.FileService.WebAPI.FileManagement;
