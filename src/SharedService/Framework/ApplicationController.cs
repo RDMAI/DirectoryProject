@@ -12,7 +12,7 @@ public class ApplicationController : Controller
     public IActionResult ToAPIResponse<T>(Result<T> result)
     {
         if (result.IsSuccess)
-            return Ok(Envelope.Ok(result.Value));
+            return new OkObjectResult(Envelope.Ok(result.Value));
 
         return Error(result.Errors);
     }
@@ -21,7 +21,7 @@ public class ApplicationController : Controller
     public IActionResult ToAPIResponse(UnitResult result)
     {
         if (result.IsSuccess)
-            return Ok(Envelope.Ok(string.Empty));
+            return new OkObjectResult(Envelope.Ok(string.Empty));
 
         return Error(result.Errors);
     }

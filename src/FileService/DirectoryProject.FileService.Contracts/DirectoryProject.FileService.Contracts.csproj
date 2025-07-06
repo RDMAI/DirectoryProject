@@ -5,10 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <PackageId>SharedKernel</PackageId>
-    <Version>1.0.3</Version>
+    <PackageId>FileService.Contracts</PackageId>
+    <Version>1.0.1</Version>
     <Authors>RDMAI</Authors>
-    <PackageDescription>Shared Kernel project</PackageDescription>
+    <PackageDescription>Requests, responses and dtos for file service</PackageDescription>
     <RepositoryUrl>https://github.com/RDMAI/DirectoryProject</RepositoryUrl>
   </PropertyGroup>
 

@@ -5,20 +5,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <PackageId>Core</PackageId>
-    <Version>1.0.6</Version>
+    <PackageId>FileService.Communication</PackageId>
+    <Version>1.0.1</Version>
     <Authors>RDMAI</Authors>
-    <PackageDescription>Shared core project</PackageDescription>
+    <PackageDescription>Http client for file service</PackageDescription>
     <RepositoryUrl>https://github.com/RDMAI/DirectoryProject</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
     <PackageReference Include="SharedKernel" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DirectoryProject.FileService.Contracts\DirectoryProject.FileService.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
