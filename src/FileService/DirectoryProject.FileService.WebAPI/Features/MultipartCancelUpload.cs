@@ -1,9 +1,6 @@
-﻿using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Requests;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
-using Framework.Helpers;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
@@ -17,11 +14,7 @@ public sealed class MultipartCancelUpload
         }
     }
 
-    public record MultipartCancelUploadRequest(
-        FileLocation Location,
-        string UploadId);
-
-    public static async Task<IActionResult> Handler(
+    public static async Task<IResult> Handler(
         MultipartCancelUploadRequest request,
         IS3Provider s3Provider,
         CancellationToken ct = default)
@@ -31,6 +24,6 @@ public sealed class MultipartCancelUpload
             request.UploadId,
             ct: ct);
 
-        return APIResponseHelper.ToAPIResponse(UnitResult.Success());
+        return Results.Ok(string.Empty);
     }
 }

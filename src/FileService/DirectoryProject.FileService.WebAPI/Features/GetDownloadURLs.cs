@@ -1,9 +1,7 @@
-﻿using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Requests;
+using DirectoryProject.FileService.Contracts.Responses;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
-using Framework.Helpers;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
@@ -13,35 +11,22 @@ public sealed class GetDownloadURLs
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/files/urls", Handler);
+            app.MapPost("/api/files/downloadurls", Handler);
         }
     }
 
-    public record GetDownloadURLsRequest(
-        List<FileLocation> Locations);
-
-    public record GetDownloadURLsResponse(
-        List<FileURL> URLs);
-
-    public static async Task<IActionResult> Handler(
+    public static async Task<IResult> Handler(
         GetDownloadURLsRequest request,
         IS3Provider s3Provider,
         CancellationToken ct = default)
     {
         if (request.Locations.Count > 0)
-        {
-            var error = ErrorHelper.General.ValueIsNullOrEmpty(
-                    nameof(GetDownloadURLsRequest.Locations));
-
-            return APIResponseHelper.ToAPIResponse(error);
-        }
+            return Results.BadRequest("Location list is empty");
 
         var urls = await s3Provider.GenerateDownloadUrlsAsync(
             locations: request.Locations);
 
-        var output = Result.Success(
-            new GetDownloadURLsResponse(urls));
 
-        return APIResponseHelper.ToAPIResponse(output);
+        return Results.Ok(new GetDownloadURLsResponse(urls));
     }
 }

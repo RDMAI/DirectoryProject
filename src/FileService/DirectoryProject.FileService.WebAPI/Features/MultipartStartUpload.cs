@@ -1,9 +1,8 @@
-﻿using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Dto;
+using DirectoryProject.FileService.Contracts.Requests;
+using DirectoryProject.FileService.Contracts.Responses;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
-using Framework.Helpers;
-using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
@@ -17,22 +16,9 @@ public sealed class MultipartStartUpload
         }
     }
 
-    public record MultipartStartUploadRequest(
-        string FileName,
-        string ContentType,
-        long FileSize,
-        string BucketName);
-
-    public record MultipartStartUploadResponse(
-        FileLocation Location,
-        string UploadId,
-        long ChunkSize,
-        int TotalChunks,
-        IReadOnlyList<string> ChunkUploadUrls);
-
     public const int CHUNK_SIZE = 10 * 1024 * 1024; // 10 Mb
 
-    public static async Task<IActionResult> Handler(
+    public static async Task<IResult> Handler(
         MultipartStartUploadRequest request,
         IS3Provider s3Provider,
         CancellationToken ct = default)
@@ -63,8 +49,6 @@ public sealed class MultipartStartUpload
             TotalChunks: totalChunks,
             ChunkUploadUrls: urls);
 
-        var output = Result.Success(response);
-
-        return APIResponseHelper.ToAPIResponse(output);
+        return Results.Ok(response);
     }
 }

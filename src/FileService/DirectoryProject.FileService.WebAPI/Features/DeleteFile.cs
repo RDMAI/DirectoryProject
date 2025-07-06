@@ -1,10 +1,8 @@
-﻿using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Dto;
+using DirectoryProject.FileService.Contracts.Responses;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
-using Framework.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using SharedKernel;
-using static DirectoryProject.FileService.WebAPI.Features.GetChunkUploadURL;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
@@ -20,32 +18,22 @@ public sealed class DeleteFile
         }
     }
 
-    public static async Task<IActionResult> Handler(
+    public static async Task<IResult> Handler(
         [FromRoute] Guid fileId,
         [FromQuery] string bucketName,
         IS3Provider s3Provider,
         CancellationToken ct = default)
     {
         if (fileId == Guid.Empty)
-        {
-            var error = ErrorHelper.General.ValueIsNullOrEmpty(
-                    nameof(GetChunkUploadURLRequest.PartNumber));
-
-            return APIResponseHelper.ToAPIResponse(error);
-        }
+            return Results.BadRequest("FileId is invalid");
 
         var deletedId = await s3Provider.DeleteFileAsync(
             location: new FileLocation(fileId.ToString(), bucketName),
             ct: ct);
 
         if (string.IsNullOrEmpty(deletedId))
-        {
-            var error = ErrorHelper.General.NotFound(fileId);
-            return APIResponseHelper.ToAPIResponse(error);
-        }
+            return Results.NotFound(deletedId);
 
-        var output = Result.Success(deletedId);
-
-        return APIResponseHelper.ToAPIResponse(output);
+        return Results.Ok(new DeleteFileResponse(deletedId));
     }
 }

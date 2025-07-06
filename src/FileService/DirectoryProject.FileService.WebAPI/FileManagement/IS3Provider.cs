@@ -1,4 +1,4 @@
-﻿using DirectoryProject.FileService.WebAPI.Domain;
+﻿using DirectoryProject.FileService.Contracts.Dto;
 
 namespace DirectoryProject.FileService.WebAPI.FileManagement;
 
