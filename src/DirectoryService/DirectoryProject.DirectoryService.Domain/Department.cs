@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 using SharedKernel.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace DirectoryProject.DirectoryService.Domain;
 
@@ -27,6 +27,8 @@ public class Department
     public IReadOnlyList<DepartmentPosition> DepartmentPositions => _departmentPositions.AsReadOnly();
 
     public List<Department> Children { get; private set; }
+
+    public Logo Logo { get; private set; }
 
     // for optimistic locking in EF Core
     private uint version;
@@ -67,6 +69,13 @@ public class Department
     public Department UpdateLocations(IEnumerable<Id<Location>> locationIds)
     {
         _departmentLocations = locationIds.Select(lid => new DepartmentLocation(Id, lid)).ToList();
+
+        return this;
+    }
+
+    public Department UpdateLogo(Logo logo)
+    {
+        Logo = logo;
 
         return this;
     }

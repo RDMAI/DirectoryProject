@@ -43,7 +43,7 @@ public class GetLocationsHandler
         var totalCountBuilder = new CustomSQLBuilder(
             """
             SELECT count(id)
-            FROM diretory_service.locations
+            FROM directory_service.locations
             WHERE is_active = true
             """);
         if (string.IsNullOrEmpty(query.Search) == false)
@@ -60,7 +60,7 @@ public class GetLocationsHandler
         var selectBuilder = new CustomSQLBuilder(
             """
             SELECT id, name, address, time_zone
-            FROM diretory_service.locations
+            FROM directory_service.locations
             WHERE is_active = true
             """);
         if (string.IsNullOrEmpty(query.Search) == false)

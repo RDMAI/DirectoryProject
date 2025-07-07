@@ -91,6 +91,26 @@ public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
             .IsRequired()
             .HasColumnName("updated_at");
 
+        builder.OwnsOne(d => d.Logo, ib =>
+        {
+            ib.ToJson("logo");
+
+            ib.Property(i => i.FileId)
+                .IsRequired();
+
+            ib.Property(i => i.Location)
+                .IsRequired()
+                .HasMaxLength(Logo.MAX_LENGTH);
+
+            ib.Property(i => i.FileName)
+                .IsRequired()
+                .HasMaxLength(Logo.MAX_LENGTH);
+
+            ib.Property(i => i.ContentType)
+                .IsRequired()
+                .HasMaxLength(Logo.MAX_LENGTH);
+        });
+
         builder.Property<uint>("version")
             .IsRowVersion();
     }

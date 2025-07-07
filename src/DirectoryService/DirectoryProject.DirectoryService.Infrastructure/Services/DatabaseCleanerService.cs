@@ -33,9 +33,9 @@ public class DatabaseCleanerService : IDatabaseCleanerService
         await ExecuteChildrenUpdateAsync(stoppingToken);
 
         string[] tableNames = {
-                "diretory_service.departments",
-                "diretory_service.positions",
-                "diretory_service.locations",
+                "directory_service.departments",
+                "directory_service.positions",
+                "directory_service.locations",
             };
         using var connection = _connectionFactory.Create();
         foreach (string tableName in tableNames)

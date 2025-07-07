@@ -1,3 +1,7 @@
-﻿namespace DirectoryProject.FileService.Contracts.Responses;
+﻿using DirectoryProject.FileService.Contracts.Dto;
 
-public record CompleteMultipartUploadResponse(string Key);
+namespace DirectoryProject.FileService.Contracts.Responses;
+
+public record CompleteMultipartUploadResponse(
+    string Key,
+    FileMetadata Metadata);

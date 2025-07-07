@@ -4,6 +4,9 @@ namespace DirectoryProject.FileService.WebAPI.FileManagement;
 
 public interface IS3Provider
 {
+    Task<FileMetadata> GetFileMetadataAsync(
+        FileLocation location,
+        CancellationToken ct = default);
     Task<string> StartMultipartUploadAsync(
         string fileName,
         string contentType,
@@ -36,6 +39,8 @@ public interface IS3Provider
         CancellationToken ct = default);
     Task<List<FileURL>> GenerateDownloadUrlsAsync(
         List<FileLocation> locations);
+    Task<FileURL> GenerateSingleDownloadUrlAsync(
+        FileLocation location);
 
     Task<List<string>> ListBucketsAsync(CancellationToken ct = default);
 }

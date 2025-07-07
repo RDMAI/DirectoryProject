@@ -6,6 +6,7 @@ using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDelet
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 using DirectoryProject.DirectoryService.Application.DTOs;
 using DirectoryProject.DirectoryService.WebAPI.Requests;
+using DirectoryProject.FileService.Communication;
 using Framework;
 using Microsoft.AspNetCore.Mvc;
 

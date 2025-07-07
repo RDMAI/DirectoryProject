@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,13 +13,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationWriteDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250707121737_newInitial")]
+    partial class newInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("diretory_service")
+                .HasDefaultSchema("directory_service")
                 .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -88,7 +91,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Path"), "gist");
 
-                    b.ToTable("departments", "diretory_service");
+                    b.ToTable("departments", "directory_service");
                 });
 
             modelBuilder.Entity("DirectoryProject.DirectoryService.Domain.DepartmentLocation", b =>
@@ -107,7 +110,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                     b.HasIndex("LocationId")
                         .HasDatabaseName("ix_department_locations_location_id");
 
-                    b.ToTable("department_locations", "diretory_service");
+                    b.ToTable("department_locations", "directory_service");
                 });
 
             modelBuilder.Entity("DirectoryProject.DirectoryService.Domain.DepartmentPosition", b =>
@@ -126,7 +129,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                     b.HasIndex("PositionId")
                         .HasDatabaseName("ix_department_positions_position_id");
 
-                    b.ToTable("department_positions", "diretory_service");
+                    b.ToTable("department_positions", "directory_service");
                 });
 
             modelBuilder.Entity("DirectoryProject.DirectoryService.Domain.Location", b =>
@@ -170,7 +173,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_locations_name");
 
-                    b.ToTable("locations", "diretory_service");
+                    b.ToTable("locations", "directory_service");
                 });
 
             modelBuilder.Entity("DirectoryProject.DirectoryService.Domain.Position", b =>
@@ -209,7 +212,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_positions_name");
 
-                    b.ToTable("positions", "diretory_service");
+                    b.ToTable("positions", "directory_service");
                 });
 
             modelBuilder.Entity("DirectoryProject.DirectoryService.Domain.Department", b =>
@@ -219,6 +222,44 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("fk_departments_departments_parent_id");
+
+                    b.OwnsOne("DirectoryProject.DirectoryService.Domain.DepartmentValueObjects.Logo", "Logo", b1 =>
+                        {
+                            b1.Property<Guid>("DepartmentId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("ContentType")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<string>("FileId")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("FileName")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<string>("Location")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
+
+                            b1.HasKey("DepartmentId");
+
+                            b1.ToTable("departments", "directory_service");
+
+                            b1.ToJson("logo");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DepartmentId")
+                                .HasConstraintName("fk_departments_departments_id");
+                        });
+
+                    b.Navigation("Logo")
+                        .IsRequired();
 
                     b.Navigation("Parent");
                 });
@@ -289,7 +330,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 
                             b1.HasKey("LocationId");
 
-                            b1.ToTable("locations", "diretory_service");
+                            b1.ToTable("locations", "directory_service");
 
                             b1.ToJson("address");
 

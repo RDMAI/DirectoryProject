@@ -5,7 +5,7 @@ using Framework.Endpoints;
 
 namespace DirectoryProject.FileService.WebAPI.Features;
 
-public sealed class GetDownloadURLs
+public sealed class GetMultipleDownloadURLs
 {
     public class Endpoint : IEndpoint
     {
@@ -25,7 +25,6 @@ public sealed class GetDownloadURLs
 
         var urls = await s3Provider.GenerateDownloadUrlsAsync(
             locations: request.Locations);
-
 
         return Results.Ok(new GetDownloadURLsResponse(urls));
     }

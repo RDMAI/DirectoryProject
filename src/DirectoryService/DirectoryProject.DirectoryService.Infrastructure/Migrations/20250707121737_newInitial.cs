@@ -6,31 +6,33 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Directory_Init : Migration
+    public partial class newInitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "diretory_service");
+                name: "directory_service");
 
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:PostgresExtension:ltree", ",,");
 
             migrationBuilder.CreateTable(
                 name: "departments",
-                schema: "diretory_service",
+                schema: "directory_service",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     parent_id = table.Column<Guid>(type: "uuid", nullable: true),
                     path = table.Column<string>(type: "ltree", nullable: false),
                     depth = table.Column<short>(type: "smallint", nullable: false),
                     children_count = table.Column<int>(type: "integer", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    logo = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,7 +40,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "fk_departments_departments_parent_id",
                         column: x => x.parent_id,
-                        principalSchema: "diretory_service",
+                        principalSchema: "directory_service",
                         principalTable: "departments",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -46,7 +48,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "locations",
-                schema: "diretory_service",
+                schema: "directory_service",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -54,7 +56,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                     is_active = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    time_zone = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    time_zone = table.Column<string>(type: "text", nullable: false),
                     address = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
@@ -64,7 +66,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "positions",
-                schema: "diretory_service",
+                schema: "directory_service",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -81,7 +83,7 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 
             migrationBuilder.CreateTable(
                 name: "department_locations",
-                schema: "diretory_service",
+                schema: "directory_service",
                 columns: table => new
                 {
                     department_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -93,48 +95,81 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "fk_department_locations_departments_department_id",
                         column: x => x.department_id,
-                        principalSchema: "diretory_service",
+                        principalSchema: "directory_service",
                         principalTable: "departments",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "fk_department_locations_locations_location_id",
                         column: x => x.location_id,
-                        principalSchema: "diretory_service",
+                        principalSchema: "directory_service",
                         principalTable: "locations",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "department_positions",
+                schema: "directory_service",
+                columns: table => new
+                {
+                    department_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    position_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_department_positions", x => new { x.department_id, x.position_id });
+                    table.ForeignKey(
+                        name: "fk_department_positions_departments_department_id",
+                        column: x => x.department_id,
+                        principalSchema: "directory_service",
+                        principalTable: "departments",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_department_positions_positions_position_id",
+                        column: x => x.position_id,
+                        principalSchema: "directory_service",
+                        principalTable: "positions",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "ix_department_locations_location_id",
-                schema: "diretory_service",
+                schema: "directory_service",
                 table: "department_locations",
                 column: "location_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_department_positions_position_id",
+                schema: "directory_service",
+                table: "department_positions",
+                column: "position_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_departments_parent_id",
-                schema: "diretory_service",
+                schema: "directory_service",
                 table: "departments",
                 column: "parent_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_departments_path",
-                schema: "diretory_service",
+                schema: "directory_service",
                 table: "departments",
-                column: "path",
-                unique: true);
+                column: "path")
+                .Annotation("Npgsql:IndexMethod", "gist");
 
             migrationBuilder.CreateIndex(
                 name: "ix_locations_name",
-                schema: "diretory_service",
+                schema: "directory_service",
                 table: "locations",
                 column: "name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "ix_positions_name",
-                schema: "diretory_service",
+                schema: "directory_service",
                 table: "positions",
                 column: "name",
                 unique: true);
@@ -145,19 +180,23 @@ namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "department_locations",
-                schema: "diretory_service");
+                schema: "directory_service");
 
             migrationBuilder.DropTable(
-                name: "positions",
-                schema: "diretory_service");
-
-            migrationBuilder.DropTable(
-                name: "departments",
-                schema: "diretory_service");
+                name: "department_positions",
+                schema: "directory_service");
 
             migrationBuilder.DropTable(
                 name: "locations",
-                schema: "diretory_service");
+                schema: "directory_service");
+
+            migrationBuilder.DropTable(
+                name: "departments",
+                schema: "directory_service");
+
+            migrationBuilder.DropTable(
+                name: "positions",
+                schema: "directory_service");
         }
     }
 }

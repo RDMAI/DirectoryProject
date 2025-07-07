@@ -43,7 +43,7 @@ public class GetRootDepartmentsHandler
         var totalCountBuilder = new CustomSQLBuilder(
             """
             SELECT count(id)
-            FROM diretory_service.departments
+            FROM directory_service.departments
             WHERE is_active = true AND depth = 0
             """);
 
@@ -55,19 +55,19 @@ public class GetRootDepartmentsHandler
         var multipleSelectBuilder = new CustomSQLBuilder(
             """
             SELECT id, name, parent_id, path, depth, children_count
-            FROM diretory_service.departments
+            FROM directory_service.departments
             WHERE is_active = true AND depth = 0
             ORDER BY name
             LIMIT @limit OFFSET @offset;
 
-            SELECT *
+            SELECT id, name, parent_id, path, depth, children_count
             FROM (SELECT
                 id, name, parent_id, path, depth, children_count,
                 ROW_NUMBER () OVER (
                     PARTITION BY parent_id
                     ORDER BY name)
                     AS r_number
-                FROM diretory_service.departments
+                FROM directory_service.departments
                 WHERE is_active = true AND depth = 1)
             WHERE r_number <= @prefetch;
             """);
@@ -75,13 +75,13 @@ public class GetRootDepartmentsHandler
         multipleSelectBuilder.Parameters.Add("@limit", query.Size);
         multipleSelectBuilder.Parameters.Add("@prefetch", query.Prefetch);
 
-        var result = await connection.QueryMultipleAsync(
+        var queryResult = await connection.QueryMultipleAsync(
             multipleSelectBuilder,
             _logger,
             cancellationToken);
 
-        var roots = result.Read<DepartmentTreeDTO>().AsList();
-        var children = result.Read<DepartmentTreeDTO>();
+        var roots = queryResult.Read<DepartmentTreeDTO>().AsList();
+        var children = queryResult.Read<DepartmentDTO>();
 
         // in memory mapping with dictionary is faster than json aggregation
         // (according to https://medium.com/@nelsonciofi/the-best-way-to-store-and-retrieve-complex-objects-with-dapper-5eff32e6b29e)

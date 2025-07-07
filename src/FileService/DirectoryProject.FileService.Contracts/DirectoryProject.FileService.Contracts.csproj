@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>FileService.Contracts</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.4</Version>
     <Authors>RDMAI</Authors>
     <PackageDescription>Requests, responses and dtos for file service</PackageDescription>
     <RepositoryUrl>https://github.com/RDMAI/DirectoryProject</RepositoryUrl>

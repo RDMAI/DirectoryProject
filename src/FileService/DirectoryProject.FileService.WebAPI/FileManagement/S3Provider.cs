@@ -23,6 +23,18 @@ public class S3Provider : IS3Provider
         _logger = logger;
     }
 
+    public async Task<FileMetadata> GetFileMetadataAsync(
+        FileLocation location,
+        CancellationToken ct = default)
+    {
+        var metadataResponse = await _s3.GetObjectMetadataAsync(location.BucketName, location.FileId, ct);
+
+        var fileName = metadataResponse.Metadata["X-Amz-Meta-File-Name"];
+        var contentType = metadataResponse.Headers.ContentType;
+
+        return new FileMetadata(fileName, contentType);
+    }
+
     public async Task<string> StartMultipartUploadAsync(
         string fileName,
         string contentType,
@@ -94,6 +106,7 @@ public class S3Provider : IS3Provider
             Verb = HttpVerb.PUT,
             Expires = DateTime.UtcNow.AddDays(_options.URLExpirationDays),
             UploadId = uploadId,
+            Protocol = _options.WithSSL ? Protocol.HTTPS : Protocol.HTTP,
         };
 
         List<string> presignedURLs = [];
@@ -126,6 +139,7 @@ public class S3Provider : IS3Provider
             Expires = DateTime.UtcNow.AddDays(_options.URLExpirationDays),
             UploadId = uploadId,
             PartNumber = partNumber,
+            Protocol = _options.WithSSL ? Protocol.HTTPS : Protocol.HTTP,
         };
 
         var response = await _s3.GetPreSignedURLAsync(request);
@@ -168,6 +182,7 @@ public class S3Provider : IS3Provider
             {
                 ["file-name"] = fileName,
             },
+            Protocol = _options.WithSSL ? Protocol.HTTPS : Protocol.HTTP,
         };
 
         var response = await _s3.GetPreSignedURLAsync(request);
@@ -184,6 +199,7 @@ public class S3Provider : IS3Provider
         {
             Verb = HttpVerb.GET,  // download
             Expires = DateTime.UtcNow.AddHours(_options.URLExpirationDays),
+            Protocol = _options.WithSSL ? Protocol.HTTPS : Protocol.HTTP,
         };
 
         List<FileURL> result = [];
@@ -202,6 +218,24 @@ public class S3Provider : IS3Provider
         }
 
         return result;
+    }
+
+    public async Task<FileURL> GenerateSingleDownloadUrlAsync(
+        FileLocation location)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = location.BucketName,
+            Key = location.FileId,
+            Verb = HttpVerb.GET,  // download
+            Expires = DateTime.UtcNow.AddHours(_options.URLExpirationDays),
+            Protocol = _options.WithSSL ? Protocol.HTTPS : Protocol.HTTP,
+        };
+
+        var url = await _s3.GetPreSignedURLAsync(request);
+        _logger.LogInformation("Created download presigned URL. File id {fileId}", location.FileId);
+
+        return new FileURL(request.Key, url);
     }
 
     public async Task<List<string>> ListBucketsAsync(CancellationToken ct = default)

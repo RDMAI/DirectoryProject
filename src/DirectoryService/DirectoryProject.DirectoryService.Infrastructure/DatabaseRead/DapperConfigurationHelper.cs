@@ -1,7 +1,7 @@
-﻿using System.Data;
-using System.Text.Json;
-using Dapper;
+﻿using Dapper;
 using DirectoryProject.DirectoryService.Application.DTOs;
+using System.Data;
+using System.Text.Json;
 
 namespace DirectoryProject.DirectoryService.Infrastructure.DatabaseRead;
 
@@ -11,6 +11,7 @@ public static class DapperConfigurationHelper
     {
         DefaultTypeMap.MatchNamesWithUnderscores = true;
         SqlMapper.AddTypeHandler(new JsonTypeHandler<AddressDTO>());
+        SqlMapper.AddTypeHandler(new JsonTypeHandler<LogoDTO>());
     }
 
     public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>

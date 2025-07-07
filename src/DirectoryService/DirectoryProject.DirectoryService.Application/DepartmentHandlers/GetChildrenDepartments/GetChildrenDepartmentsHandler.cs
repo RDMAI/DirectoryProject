@@ -42,7 +42,7 @@ public class GetChildrenDepartmentsHandler
         var totalCountBuilder = new CustomSQLBuilder(
             """
             SELECT count(id)
-            FROM diretory_service.departments
+            FROM directory_service.departments
             WHERE is_active = true AND parent_id = @parent_id
             """);
         totalCountBuilder.Parameters.Add("@parent_id", query.ParentId);
@@ -55,7 +55,7 @@ public class GetChildrenDepartmentsHandler
         var selectBuilder = new CustomSQLBuilder(
             """
             SELECT id, name, parent_id, path, depth, children_count
-            FROM diretory_service.departments
+            FROM directory_service.departments
             WHERE is_active = true AND parent_id = @parent_id
             """);
         selectBuilder.Parameters.Add("@parent_id", query.ParentId);
