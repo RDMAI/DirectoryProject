@@ -17,7 +17,7 @@ public class FileHttpClient : IFileService
     }
 
     public async Task<Result<DeleteFileResponse>> DeleteFileAsync(
-        Guid fileId,
+        string fileId,
         string bucketName,
         CancellationToken ct = default)
     {

@@ -62,6 +62,13 @@ public class StartUploadLogoHandler
         if (entityResult.IsFailure)
             return entityResult.Errors;
 
+        // if logo already exist - return error and tell user to delete the old logo first
+        if (entityResult.Value.Logo is not null)
+        {
+            return ErrorHelper.General.MethodNotApplicable(
+                "Department already has Logo. To update it, first delete existing Logo");
+        }
+
         var request = new MultipartStartUploadRequest(
             FileName: logo.FileName,
             ContentType: logo.ContentType,

@@ -28,7 +28,7 @@ public class Department
 
     public List<Department> Children { get; private set; }
 
-    public Logo Logo { get; private set; }
+    public Logo? Logo { get; private set; }
 
     // for optimistic locking in EF Core
     private uint version;
@@ -73,7 +73,7 @@ public class Department
         return this;
     }
 
-    public Department UpdateLogo(Logo logo)
+    public Department UpdateLogo(Logo? logo)
     {
         Logo = logo;
 

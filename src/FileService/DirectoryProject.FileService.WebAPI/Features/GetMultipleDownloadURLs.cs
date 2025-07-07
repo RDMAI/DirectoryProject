@@ -20,7 +20,7 @@ public sealed class GetMultipleDownloadURLs
         IS3Provider s3Provider,
         CancellationToken ct = default)
     {
-        if (request.Locations.Count > 0)
+        if (request.Locations.Count <= 0)
             return Results.BadRequest("Location list is empty");
 
         var urls = await s3Provider.GenerateDownloadUrlsAsync(

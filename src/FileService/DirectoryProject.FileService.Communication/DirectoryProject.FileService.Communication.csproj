@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>FileService.Communication</PackageId>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>RDMAI</Authors>
     <PackageDescription>Http client for file service</PackageDescription>
     <RepositoryUrl>https://github.com/RDMAI/DirectoryProject</RepositoryUrl>

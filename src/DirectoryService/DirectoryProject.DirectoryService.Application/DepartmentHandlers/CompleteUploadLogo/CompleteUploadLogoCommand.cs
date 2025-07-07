@@ -5,7 +5,6 @@ namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.Compl
 
 public record CompleteUploadLogoCommand(
     Guid DepartmentId,
-
     string FileId,
     string UploadId,
     List<PartETagModel> PartETags) : ICommand;

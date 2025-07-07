@@ -11,7 +11,6 @@ public static class DapperConfigurationHelper
     {
         DefaultTypeMap.MatchNamesWithUnderscores = true;
         SqlMapper.AddTypeHandler(new JsonTypeHandler<AddressDTO>());
-        SqlMapper.AddTypeHandler(new JsonTypeHandler<LogoDTO>());
     }
 
     public class JsonTypeHandler<T> : SqlMapper.TypeHandler<T>

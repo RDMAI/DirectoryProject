@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DirectoryProject.DirectoryService.Infrastructure.DatabaseWrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DirectoryProject.DirectoryService.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationWriteDBContext))]
-    partial class ApplicationWriteDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250707173020_nullable_Logo")]
+    partial class nullable_Logo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

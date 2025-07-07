@@ -2,20 +2,25 @@
 
 namespace DirectoryProject.DirectoryService.Application.DTOs;
 
-public record DepartmentDTO(
-    Guid Id,
-    string Name,
-    Guid? ParentId,
-    string Path,
-    short Depth,
-    int ChildrenCount)
+public class DepartmentDTO
 {
-    public static DepartmentDTO FromDomainEntity(Department entity)
-        => new DepartmentDTO(
-            entity.Id.Value,
-            entity.Name.Value,
-            entity.ParentId?.Value,
-            entity.Path,
-            entity.Depth,
-            entity.ChildrenCount);
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public Guid? ParentId { get; init; }
+    public string Path { get; init; } = string.Empty;
+    public short Depth { get; init; }
+    public int ChildrenCount { get; init; }
+    public string LogoUrl { get; set; } = string.Empty;
+
+    public static DepartmentDTO FromDomainEntity(Department entity, string? logoUrl = null)
+        => new DepartmentDTO
+        {
+            Id = entity.Id.Value,
+            Name = entity.Name.Value,
+            ParentId = entity.ParentId?.Value,
+            Path = entity.Path,
+            Depth = entity.Depth,
+            ChildrenCount = entity.ChildrenCount,
+            LogoUrl = logoUrl ?? string.Empty,
+        };
 }

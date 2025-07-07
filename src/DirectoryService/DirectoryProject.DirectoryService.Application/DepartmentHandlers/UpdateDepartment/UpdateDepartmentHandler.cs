@@ -5,11 +5,14 @@ using DirectoryProject.DirectoryService.Application.DTOs;
 using DirectoryProject.DirectoryService.Application.Interfaces;
 using DirectoryProject.DirectoryService.Domain;
 using DirectoryProject.DirectoryService.Domain.DepartmentValueObjects;
-using SharedKernel;
-using SharedKernel.ValueObjects;
+using DirectoryProject.FileService.Communication;
+using DirectoryProject.FileService.Contracts.Dto;
+using DirectoryProject.FileService.Contracts.Requests;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SharedKernel;
+using SharedKernel.ValueObjects;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 
@@ -21,19 +24,22 @@ public class UpdateDepartmentHandler
     private readonly IDepartmentRepository _departmentRepository;
     private readonly ILocationRepository _locationRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IFileService _fileService;
 
     public UpdateDepartmentHandler(
         AbstractValidator<UpdateDepartmentCommand> validator,
         ILogger<UpdateDepartmentHandler> logger,
         IDepartmentRepository departmentRepository,
         ILocationRepository locationRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IFileService fileService)
     {
         _validator = validator;
         _logger = logger;
         _departmentRepository = departmentRepository;
         _locationRepository = locationRepository;
         _unitOfWork = unitOfWork;
+        _fileService = fileService;
     }
 
     public async Task<Result<DepartmentDTO>> HandleAsync(
@@ -184,6 +190,19 @@ public class UpdateDepartmentHandler
             childrenChangedCount = childrenUpdateResult.Value;
         }
 
+        // get logo url
+        string url = string.Empty;
+        if (entity.Logo is not null)
+        {
+            var fileLocation = new FileLocation(entity.Logo.FileId, entity.Logo.Location);
+            var fileRequest = new GetDownloadURLsRequest([fileLocation]);
+            var fileResponse = await _fileService.GetDownloadURLAsync(fileRequest, cancellationToken);
+            if (fileResponse.IsFailure)
+                return fileResponse.Errors;
+
+            url = fileResponse.Value.URLs[0].Url;
+        }
+
         transaction.Commit();
 
         _logger.LogInformation("Department with id {id} was updated", entity.Id);
@@ -194,7 +213,7 @@ public class UpdateDepartmentHandler
         if (childrenChangedCount > 0)
             _logger.LogInformation("Updated {count} children", childrenChangedCount);
 
-        return DepartmentDTO.FromDomainEntity(entity);
+        return DepartmentDTO.FromDomainEntity(entity, url);
     }
 
     private async Task<UnitResult> IsTreeWithoutCyclesAsync(
