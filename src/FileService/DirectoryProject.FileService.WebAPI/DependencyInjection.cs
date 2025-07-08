@@ -51,6 +51,8 @@ public static class DependencyInjection
         // cors
         services.AddCors();
 
+        services.AddAntiforgery();
+
         return services;
     }
 
@@ -76,6 +78,8 @@ public static class DependencyInjection
         {
             builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
         });
+
+        app.UseAntiforgery();
 
         app.MapEndpoints();
 

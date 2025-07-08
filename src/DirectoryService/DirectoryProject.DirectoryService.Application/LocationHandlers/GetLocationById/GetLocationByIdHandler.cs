@@ -47,7 +47,7 @@ public class GetLocationByIdHandler
         var result = await connection.QueryFirstOrDefaultAsync<LocationDTO>(new CommandDefinition(
             commandText: """
                 SELECT id, name, address, time_zone
-                FROM diretory_service.locations
+                FROM directory_service.locations
                 WHERE id = @id and is_active = true
                 """,
             parameters: parameters,

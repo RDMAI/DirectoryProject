@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Core;
 using DirectoryProject.DirectoryService.Domain;
+using DirectoryProject.FileService.Communication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +24,8 @@ public static class DependencyInjection
         services.AddApplicationHandlersWithValidators(
             Assembly.GetAssembly(typeof(DependencyInjection))!,
             configuration);
+
+        services.AddFileHttpCommunication(configuration);
 
         return services;
     }

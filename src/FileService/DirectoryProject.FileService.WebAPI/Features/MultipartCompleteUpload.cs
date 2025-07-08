@@ -29,6 +29,8 @@ public sealed class MultipartCompleteUpload
             partETags: request.PartETags,
             ct: ct);
 
-        return Results.Ok(new CompleteMultipartUploadResponse(key));
+        var metadata = await s3Provider.GetFileMetadataAsync(request.Location, ct);
+
+        return Results.Ok(new CompleteMultipartUploadResponse(key, metadata));
     }
 }

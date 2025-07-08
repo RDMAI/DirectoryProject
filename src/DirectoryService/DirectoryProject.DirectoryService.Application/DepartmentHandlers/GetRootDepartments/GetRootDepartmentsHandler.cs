@@ -2,9 +2,14 @@
 using Core.Database;
 using Dapper;
 using DirectoryProject.DirectoryService.Application.DTOs;
-using SharedKernel;
+using DirectoryProject.DirectoryService.Application.Helpers;
+using DirectoryProject.FileService.Communication;
+using DirectoryProject.FileService.Contracts.Dto;
+using DirectoryProject.FileService.Contracts.Requests;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using SharedKernel;
+using System.Linq;
 
 namespace DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
 
@@ -14,15 +19,18 @@ public class GetRootDepartmentsHandler
     private readonly AbstractValidator<GetRootDepartmentsQuery> _validator;
     private readonly ILogger<GetRootDepartmentsHandler> _logger;
     private readonly IDBConnectionFactory _connectionFactory;
+    private readonly IFileService _fileService;
 
     public GetRootDepartmentsHandler(
         AbstractValidator<GetRootDepartmentsQuery> validator,
         ILogger<GetRootDepartmentsHandler> logger,
-        IDBConnectionFactory connectionFactory)
+        IDBConnectionFactory connectionFactory,
+        IFileService fileService)
     {
         _validator = validator;
         _logger = logger;
         _connectionFactory = connectionFactory;
+        _fileService = fileService;
     }
 
     public async Task<Result<FilteredListDTO<DepartmentTreeDTO>>> HandleAsync(
@@ -43,7 +51,7 @@ public class GetRootDepartmentsHandler
         var totalCountBuilder = new CustomSQLBuilder(
             """
             SELECT count(id)
-            FROM diretory_service.departments
+            FROM directory_service.departments
             WHERE is_active = true AND depth = 0
             """);
 
@@ -54,20 +62,22 @@ public class GetRootDepartmentsHandler
 
         var multipleSelectBuilder = new CustomSQLBuilder(
             """
-            SELECT id, name, parent_id, path, depth, children_count
-            FROM diretory_service.departments
+            SELECT id, name, parent_id, path, depth, children_count,
+                CONCAT(logo->>'fileid', '|', logo->>'location') AS LogoUrl
+            FROM directory_service.departments
             WHERE is_active = true AND depth = 0
             ORDER BY name
             LIMIT @limit OFFSET @offset;
 
-            SELECT *
+            SELECT id, name, parent_id, path, depth, children_count,
+                CONCAT(logo->>'fileid', '|', logo->>'location') AS LogoUrl
             FROM (SELECT
-                id, name, parent_id, path, depth, children_count,
+                id, name, parent_id, path, depth, children_count, logo,
                 ROW_NUMBER () OVER (
                     PARTITION BY parent_id
                     ORDER BY name)
                     AS r_number
-                FROM diretory_service.departments
+                FROM directory_service.departments
                 WHERE is_active = true AND depth = 1)
             WHERE r_number <= @prefetch;
             """);
@@ -75,13 +85,20 @@ public class GetRootDepartmentsHandler
         multipleSelectBuilder.Parameters.Add("@limit", query.Size);
         multipleSelectBuilder.Parameters.Add("@prefetch", query.Prefetch);
 
-        var result = await connection.QueryMultipleAsync(
+        var queryResult = await connection.QueryMultipleAsync(
             multipleSelectBuilder,
             _logger,
             cancellationToken);
 
-        var roots = result.Read<DepartmentTreeDTO>().AsList();
-        var children = result.Read<DepartmentTreeDTO>();
+        var roots = queryResult.Read<DepartmentTreeDTO>().AsList();
+        var children = queryResult.Read<DepartmentDTO>();
+
+        var getUrlsResponse = await ConvertLogoObjectsToUrls(
+            roots,
+            children,
+            cancellationToken);
+        if (getUrlsResponse.IsFailure)
+            return getUrlsResponse.Errors;
 
         // in memory mapping with dictionary is faster than json aggregation
         // (according to https://medium.com/@nelsonciofi/the-best-way-to-store-and-retrieve-complex-objects-with-dapper-5eff32e6b29e)
@@ -102,5 +119,76 @@ public class GetRootDepartmentsHandler
             Size: query.Size,
             Total: totalCount,
             Data: roots);
+    }
+
+    /// <summary>
+    /// SQL select query returns DepartmentDTO with LogoUrl containing file id and bucket name separated by '|'.
+    /// To get actual urls we call file service
+    /// </summary>
+    /// <param name="departmentsWithLogo"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    private async Task<UnitResult> ConvertLogoObjectsToUrls(
+        IEnumerable<DepartmentTreeDTO> rootDepartmentsWithLogo,
+        IEnumerable<DepartmentDTO> childrenDepartmentsWithLogo,
+        CancellationToken cancellationToken = default)
+    {
+        int rootCount = rootDepartmentsWithLogo.Count();
+        int childrenCount = childrenDepartmentsWithLogo.Count();
+
+        // fill up the list of logo requests for both parents and children
+        var logoLocations = new List<FileLocation>(rootCount + childrenCount);
+
+        foreach (var dep in rootDepartmentsWithLogo)
+        {
+            if (dep.LogoUrl.Length == 1) // this happens if the logo is null
+            {
+                dep.LogoUrl = string.Empty;
+                continue;
+            }
+
+            var fileLocation = DepartmentSqlHelper.ConvertStringToFileLocation(dep.LogoUrl);
+            logoLocations.Add(fileLocation);
+        }
+
+        foreach (var dep in childrenDepartmentsWithLogo)
+        {
+            if (dep.LogoUrl.Length == 1) // this happens if the logo is null
+            {
+                dep.LogoUrl = string.Empty;
+                continue;
+            }
+
+            var fileLocation = DepartmentSqlHelper.ConvertStringToFileLocation(dep.LogoUrl);
+            logoLocations.Add(fileLocation);
+        }
+
+        var fileResponse = await _fileService.GetDownloadURLAsync(
+            new GetDownloadURLsRequest(logoLocations),
+            cancellationToken);
+        if (fileResponse.IsFailure)
+            return fileResponse.Errors;
+
+        // mapping back gotten responses to their departments (they should be in the same order)
+        int counter = 0;
+        foreach (var dep in rootDepartmentsWithLogo)
+        {
+            if (string.IsNullOrEmpty(dep.LogoUrl))
+                continue;
+
+            dep.LogoUrl = fileResponse.Value.URLs[counter].Url;
+            counter++;
+        }
+
+        foreach (var dep in childrenDepartmentsWithLogo)
+        {
+            if (string.IsNullOrEmpty(dep.LogoUrl))
+                continue;
+
+            dep.LogoUrl = fileResponse.Value.URLs[counter].Url;
+            counter++;
+        }
+
+        return UnitResult.Success();
     }
 }

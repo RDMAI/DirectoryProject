@@ -8,7 +8,7 @@ namespace DirectoryProject.FileService.Communication;
 public interface IFileService
 {
     Task<Result<DeleteFileResponse>> DeleteFileAsync(
-        Guid fileId,
+        string fileId,
         string bucketName,
         CancellationToken ct = default);
 

@@ -1,11 +1,15 @@
 ﻿using Core.Abstractions;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CompleteUploadLogo;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.CreateDepartment;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.DeleteLogo;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetChildrenDepartments;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.GetRootDepartments;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.SoftDeleteDepartment;
+using DirectoryProject.DirectoryService.Application.DepartmentHandlers.StartUploadLogo;
 using DirectoryProject.DirectoryService.Application.DepartmentHandlers.UpdateDepartment;
 using DirectoryProject.DirectoryService.Application.DTOs;
 using DirectoryProject.DirectoryService.WebAPI.Requests;
+using DirectoryProject.FileService.Contracts.Responses;
 using Framework;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,6 +62,42 @@ public class DepartmentsController : ApplicationController
         CancellationToken cancellationToken = default)
     {
         var command = new SoftDeleteDepartmentCommand(id);
+
+        return ToAPIResponse(await handler.HandleAsync(command, cancellationToken));
+    }
+
+    [HttpPut("{id:guid}/logo/start-upload")]
+    public async Task<IActionResult> StartUploadLogo(
+        [FromServices] ICommandHandler<StartUploadLogoCommand, MultipartStartUploadResponse> handler,
+        [FromBody] StartUploadDepartmentLogoRequest request,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = request.ToCommand(id);
+
+        return ToAPIResponse(await handler.HandleAsync(command, cancellationToken));
+    }
+
+    [HttpPut("{id:guid}/logo/complete-upload")]
+    public async Task<IActionResult> CompleteUploadLogo(
+        [FromServices] ICommandHandler<CompleteUploadLogoCommand, CompleteMultipartUploadResponse> handler,
+        [FromBody] CompleteUploadDepartmentLogoRequest request,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = request.ToCommand(id);
+
+        return ToAPIResponse(await handler.HandleAsync(command, cancellationToken));
+    }
+
+    [HttpDelete("{id:guid}/logo")]
+    public async Task<IActionResult> DeleteLogo(
+        [FromServices] ICommandHandler<DeleteLogoCommand, DeleteFileResponse> handler,
+        [FromBody] DeleteDepartmentLogoRequest request,
+        [FromRoute] Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var command = request.ToCommand(id);
 
         return ToAPIResponse(await handler.HandleAsync(command, cancellationToken));
     }

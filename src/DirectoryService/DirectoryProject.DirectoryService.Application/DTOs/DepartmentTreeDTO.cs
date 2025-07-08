@@ -1,23 +1,14 @@
-﻿using DirectoryProject.DirectoryService.Domain;
+﻿namespace DirectoryProject.DirectoryService.Application.DTOs;
 
-namespace DirectoryProject.DirectoryService.Application.DTOs;
-
-public record DepartmentTreeDTO(
-    Guid Id,
-    string Name,
-    string Path,
-    short Depth,
-    Guid? ParentId,
-    int ChildrenCount,
-    List<DepartmentTreeDTO> Children)
+public class DepartmentTreeDTO
 {
-    public static DepartmentTreeDTO FromDomainEntity(Department entity, IEnumerable<Department>? children = null)
-        => new DepartmentTreeDTO(
-            Id: entity.Id.Value,
-            Name: entity.Name.Value,
-            Path: entity.Path,
-            Depth: entity.Depth,
-            ParentId: entity.ParentId?.Value,
-            ChildrenCount: entity.ChildrenCount,
-            Children: children is null ? [] : children.Select(d => FromDomainEntity(d)).ToList());
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public Guid? ParentId { get; init; }
+    public string Path { get; init; } = string.Empty;
+    public short Depth { get; init; }
+    public int ChildrenCount { get; init; }
+    public string LogoUrl { get; set; } = string.Empty;
+
+    public List<DepartmentDTO> Children { get; set; } = [];
 }

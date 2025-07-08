@@ -38,7 +38,7 @@ public class ApplicationWriteDBContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("diretory_service");
+        modelBuilder.HasDefaultSchema("directory_service");
 
         modelBuilder.HasPostgresExtension("ltree");  // used in entities: Department
 
