@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Amazon.S3;
+using DirectoryProject.FileService.WebAPI.BackgroundServices;
 using DirectoryProject.FileService.WebAPI.FileManagement;
 using Framework.Endpoints;
 using Framework.Logging;
@@ -48,7 +49,12 @@ public static class DependencyInjection
             return new AmazonS3Client(s3Options.AccessKey, s3Options.SecretKey, config);
         });
 
-        // cors
+        // multipart cleaner configuration
+        var multipartCleanerSection = configuration.GetSection(MultipartCleanerOptions.SECTION_NAME)
+            ?? throw new ApplicationException("Multipart cleaner background service is misconfigured");
+        services.Configure<MultipartCleanerOptions>(multipartCleanerSection);
+        services.AddHostedService<MultipartCleanerBackgroundService>();
+
         services.AddCors();
 
         services.AddAntiforgery();
