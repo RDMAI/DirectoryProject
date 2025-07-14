@@ -3,6 +3,7 @@ using Framework.Endpoints;
 using Framework.Logging;
 using Framework.Middlewares;
 using Microsoft.AspNetCore.Mvc;
+using OrderService.WebAPI.Database;
 
 namespace OrderService.WebAPI;
 
@@ -19,6 +20,9 @@ public static class DependencyInjection
         {
             options.SuppressModelStateInvalidFilter = true;
         });
+
+        var dbConnectionString = configuration.GetConnectionString(ApplicationDBContext.DATABASE_CONFIGURATION);
+        services.AddScoped(_ => new ApplicationDBContext(dbConnectionString));
 
         services.AddEndpoints(Assembly.GetExecutingAssembly());
         services.AddEndpointsApiExplorer();
