@@ -2,6 +2,7 @@
 using Amazon.S3.Model;
 using DirectoryProject.FileService.Contracts.Dto;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 
 namespace DirectoryProject.FileService.WebAPI.FileManagement;
 
@@ -243,5 +244,31 @@ public class S3Provider : IS3Provider
         var response = await _s3.ListBucketsAsync(ct);
 
         return response.Buckets.Select(d => d.BucketName).ToList();
+    }
+
+    public async Task<List<(string BucketName, string UploadId, string Key, DateTime InitiatedAt)>> ListMultipartUploadsAsync(
+        IEnumerable<string> bucketNames,
+        CancellationToken ct = default)
+    {
+        List<(string BucketName, string UploadId, string Key, DateTime InitiatedAt)> uploads = [];
+        foreach (var bucketName in bucketNames)
+        {
+            var response = await _s3.ListMultipartUploadsAsync(bucketName, ct);
+
+            if (response.MultipartUploads is null)
+                continue;
+
+            var uploadInfos =
+                from u in response.MultipartUploads
+                select (
+                    BucketName: bucketName,
+                    UploadId: u.UploadId,
+                    Key: u.Key,
+                    InitiatedAt: u.Initiated ?? DateTime.UtcNow);
+
+            uploads.AddRange(uploadInfos);
+        }
+
+        return uploads;
     }
 }

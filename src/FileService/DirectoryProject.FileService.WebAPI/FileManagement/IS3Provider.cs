@@ -43,4 +43,8 @@ public interface IS3Provider
         FileLocation location);
 
     Task<List<string>> ListBucketsAsync(CancellationToken ct = default);
+    Task<List<(string BucketName, string UploadId, string Key, DateTime InitiatedAt)>> ListMultipartUploadsAsync(
+        IEnumerable<string> bucketNames,
+        CancellationToken ct = default);
+
 }
