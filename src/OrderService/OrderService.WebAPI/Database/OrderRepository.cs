@@ -15,25 +15,43 @@ public class OrderRepository : IOrderRepository
 
     public async Task<UnitResult> CreateAsync(Order entity, CancellationToken ct = default)
     {
-        _dbContext.Orders.Add(entity);
-        await _dbContext.SaveChangesAsync(ct);
-
-        return UnitResult.Success();
+        try
+        {
+            _dbContext.Orders.Add(entity);
+            await _dbContext.SaveChangesAsync(ct);
+            return UnitResult.Success();
+        }
+        catch (Exception ex)
+        {
+            return Error.Failure("create.failed", $"Failed to create order with id {entity.Id}");
+        }
     }
 
     public async Task<UnitResult> UpdateAsync(Order entity, CancellationToken ct = default)
     {
-        await _dbContext.SaveChangesAsync(ct);
-
-        return UnitResult.Success();
+        try
+        {
+            await _dbContext.SaveChangesAsync(ct);
+            return UnitResult.Success();
+        }
+        catch (Exception ex)
+        {
+            return Error.Failure("update.failed", $"Failed to update order with id {entity.Id}");
+        }
     }
 
     public async Task<UnitResult> DeleteAsync(Order entity, CancellationToken ct = default)
     {
-        _dbContext.Orders.Remove(entity);
-        await _dbContext.SaveChangesAsync(ct);
-
-        return UnitResult.Success();
+        try
+        {
+            _dbContext.Orders.Remove(entity);
+            await _dbContext.SaveChangesAsync(ct);
+            return UnitResult.Success();
+        }
+        catch (Exception ex)
+        {
+            return Error.Failure("delete.failed", $"Failed to delete order with id {entity.Id}");
+        }
     }
 
     public async Task<Result<Order>> GetByIdAsync(
