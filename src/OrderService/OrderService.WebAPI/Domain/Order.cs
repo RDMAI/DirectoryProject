@@ -10,7 +10,6 @@ public class Order
         Confirmed = 20,
         Rejected = 30,
         Canceled = 31,
-        Finished = 39,
     }
 
     public Guid Id { get; private set; }
@@ -76,6 +75,7 @@ public class Order
         _items = items;
         Status = OrderStatuses.Pending;
         CreatedAt = DateTime.UtcNow;
+        UpdatedAt = CreatedAt;
     }
 
     // ef core

@@ -1,4 +1,5 @@
-﻿using SharedKernel;
+﻿using OrderService.WebAPI.Domain.ValueObjects;
+using SharedKernel;
 
 namespace OrderService.WebAPI.Domain;
 
@@ -6,78 +7,41 @@ public class OrderItem
 {
     public Guid Id { get; private set; }
     public Guid OrderId { get; private set; }
-    public string BoxSize { get; private set; }
-    public DateTime StartDate { get; private set; }
-    public DateTime EndDate { get; private set; }
-    public int Quantity { get; private set; }
+    public OrderItemBoxSize BoxSize { get; private set; }
+    public OrderItemPeriod Period { get; private set; }
+    public OrderItemQuantity Quantity { get; private set; }
 
     public static Result<OrderItem> Create(
         Guid id,
         Guid orderId,
-        string boxSize,
-        DateTime startDate,
-        DateTime endDate,
-        int quantity)
+        OrderItemBoxSize boxSize,
+        OrderItemPeriod period,
+        OrderItemQuantity quantity)
     {
         if (id == Guid.Empty)
             return ErrorHelper.General.ValueIsNullOrEmpty(nameof(Id));
         if (orderId == Guid.Empty)
             return ErrorHelper.General.ValueIsNullOrEmpty(nameof(OrderId));
-        if (string.IsNullOrEmpty(boxSize))
-            return ErrorHelper.General.ValueIsInvalid(nameof(BoxSize));
 
-        var entity = new OrderItem(id, orderId, boxSize);
-
-        var changeStartDateResult = entity.ChangeStartDate(startDate);
-        if (changeStartDateResult.IsFailure) return changeStartDateResult.Errors;
-
-        var changeEndDateResult = entity.ChangeEndDate(endDate);
-        if (changeEndDateResult.IsFailure) return changeEndDateResult.Errors;
-
-        var changeQuantityResult = entity.ChangeQuantity(quantity);
-        if (changeQuantityResult.IsFailure) return changeQuantityResult.Errors;
-
-        return entity;
+        return new OrderItem(id, orderId, boxSize, period, quantity);
     }
 
-    public UnitResult ChangeStartDate(DateTime newStartDateTime)
-    {
-        if (newStartDateTime < DateTime.Today)
-            return ErrorHelper.General.ValueIsInvalid(nameof(StartDate));
+    public void ChangePeriod(OrderItemPeriod period) => Period = period;
 
-        StartDate = newStartDateTime;
-
-        return UnitResult.Success();
-    }
-
-    public UnitResult ChangeEndDate(DateTime newEndDateTime)
-    {
-        if (newEndDateTime <= StartDate)
-            return ErrorHelper.General.ValueIsInvalid(nameof(EndDate));
-
-        EndDate = newEndDateTime;
-
-        return UnitResult.Success();
-    }
-
-    public UnitResult ChangeQuantity(int newQuantity)
-    {
-        if (newQuantity < 0)
-            return ErrorHelper.General.ValueIsInvalid(nameof(Quantity));
-
-        Quantity = newQuantity;
-
-        return UnitResult.Success();
-    }
+    public void ChangeQuantity(OrderItemQuantity newQuantity) => Quantity = newQuantity;
 
     private OrderItem(
         Guid id,
         Guid orderId,
-        string boxSize)
+        OrderItemBoxSize boxSize,
+        OrderItemPeriod period,
+        OrderItemQuantity quantity)
     {
         Id = id;
         OrderId = orderId;
         BoxSize = boxSize;
+        Period = period;
+        Quantity = quantity;
     }
 
     // ef core

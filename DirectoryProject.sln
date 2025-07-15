@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.WebAPI", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryService.WepAPI", "src\InventoryService\InventoryService.WepAPI\InventoryService.WepAPI.csproj", "{9E6A78D9-AE03-4312-A6FF-01F2CB2DA5C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Contracts", "src\OrderService\OrderService.Contracts\OrderService.Contracts.csproj", "{514452FE-0A29-4222-93DC-8C80FB03F608}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,10 @@ Global
 		{9E6A78D9-AE03-4312-A6FF-01F2CB2DA5C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E6A78D9-AE03-4312-A6FF-01F2CB2DA5C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E6A78D9-AE03-4312-A6FF-01F2CB2DA5C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{514452FE-0A29-4222-93DC-8C80FB03F608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{514452FE-0A29-4222-93DC-8C80FB03F608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{514452FE-0A29-4222-93DC-8C80FB03F608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{514452FE-0A29-4222-93DC-8C80FB03F608}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -141,6 +147,7 @@ Global
 		{40176640-BA70-4554-9BA1-2BB9EBE6407C} = {B658F8C3-5410-41A8-A17B-4D60DAD6909B}
 		{320CD8DE-D695-45C3-AF69-F2A5B6882F88} = {D092FBC0-6182-49A9-8666-E882270BE54E}
 		{9E6A78D9-AE03-4312-A6FF-01F2CB2DA5C9} = {40176640-BA70-4554-9BA1-2BB9EBE6407C}
+		{514452FE-0A29-4222-93DC-8C80FB03F608} = {D092FBC0-6182-49A9-8666-E882270BE54E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA164B78-DC63-496E-A526-CEA658D2956E}

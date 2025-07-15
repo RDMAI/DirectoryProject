@@ -2,38 +2,45 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using OrderService.WebAPI.Domain;
 
-namespace OrderService.WebAPI.Database;
+namespace OrderService.WebAPI.Database.Configurations;
 
-public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
+public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
-    public void Configure(EntityTypeBuilder<OrderItem> builder)
+    public void Configure(EntityTypeBuilder<Order> builder)
     {
-        builder.ToTable("order_items");
+        builder.ToTable("orders");
 
         builder.HasKey(o => o.Id);
         builder.Property(o => o.Id)
             .HasColumnName("id");
 
-        builder.Property(o => o.BoxSize)
+        builder.Property(o => o.CustomerId)
             .IsRequired()
-            .HasColumnName("box_size");
+            .HasColumnName("customer_id");
 
-        builder.Property(o => o.Quantity)
+        builder.HasMany(o => o.Items)
+            .WithOne()
+            .HasForeignKey(item => item.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(o => o.Status)
             .IsRequired()
-            .HasColumnName("quantity");
+            .HasColumnName("status");
 
-        builder.Property(d => d.StartDate)
+        builder.Property(d => d.CreatedAt)
             .HasConversion(
                 src => src.Kind == DateTimeKind.Utc ? src : DateTime.SpecifyKind(src, DateTimeKind.Utc),
                 dst => dst.Kind == DateTimeKind.Utc ? dst : DateTime.SpecifyKind(dst, DateTimeKind.Utc))
             .IsRequired()
-            .HasColumnName("start_date");
+            .HasColumnName("created_at");
 
-        builder.Property(d => d.EndDate)
+        builder.Property(d => d.UpdatedAt)
             .HasConversion(
                 src => src.Kind == DateTimeKind.Utc ? src : DateTime.SpecifyKind(src, DateTimeKind.Utc),
                 dst => dst.Kind == DateTimeKind.Utc ? dst : DateTime.SpecifyKind(dst, DateTimeKind.Utc))
             .IsRequired()
-            .HasColumnName("end_date");
+            .HasColumnName("updated_at");
+
+
     }
 }

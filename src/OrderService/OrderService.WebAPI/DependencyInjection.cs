@@ -23,6 +23,7 @@ public static class DependencyInjection
 
         var dbConnectionString = configuration.GetConnectionString(ApplicationDBContext.DATABASE_CONFIGURATION);
         services.AddScoped(_ => new ApplicationDBContext(dbConnectionString));
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         services.AddEndpoints(Assembly.GetExecutingAssembly());
         services.AddEndpointsApiExplorer();
@@ -40,6 +41,11 @@ public static class DependencyInjection
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            await using var scope = app.Services.CreateAsyncScope();
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+            await dbContext.ApplyMigrationsAsync();
+
             app.UseSwagger();
             app.UseSwaggerUI();
         }
@@ -47,6 +53,8 @@ public static class DependencyInjection
         app.UseAPILogging();
 
         app.UseHttpsRedirection();
+
+        app.MapEndpoints();
 
         return app;
     }
