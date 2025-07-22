@@ -13,13 +13,13 @@ public class OrderRepository : IOrderRepository
         _dbContext = dbContext;
     }
 
-    public async Task<UnitResult> CreateAsync(Order entity, CancellationToken ct = default)
+    public async Task<Result<Order>> CreateAsync(Order entity, CancellationToken ct = default)
     {
         try
         {
             _dbContext.Orders.Add(entity);
             await _dbContext.SaveChangesAsync(ct);
-            return UnitResult.Success();
+            return entity;
         }
         catch (Exception ex)
         {
@@ -27,12 +27,12 @@ public class OrderRepository : IOrderRepository
         }
     }
 
-    public async Task<UnitResult> UpdateAsync(Order entity, CancellationToken ct = default)
+    public async Task<Result<Order>> UpdateAsync(Order entity, CancellationToken ct = default)
     {
         try
         {
             await _dbContext.SaveChangesAsync(ct);
-            return UnitResult.Success();
+            return entity;
         }
         catch (Exception ex)
         {
@@ -40,13 +40,13 @@ public class OrderRepository : IOrderRepository
         }
     }
 
-    public async Task<UnitResult> DeleteAsync(Order entity, CancellationToken ct = default)
+    public async Task<Result<Order>> DeleteAsync(Order entity, CancellationToken ct = default)
     {
         try
         {
             _dbContext.Orders.Remove(entity);
             await _dbContext.SaveChangesAsync(ct);
-            return UnitResult.Success();
+            return entity;
         }
         catch (Exception ex)
         {
