@@ -1,6 +1,9 @@
 ﻿using FluentValidation;
 using Framework.Endpoints;
+using MassTransit;
+using MassTransit.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
+using OrderService.Contracts.Events;
 using OrderService.WebAPI.Database;
 using OrderService.WebAPI.Domain;
 using SharedKernel;
@@ -22,6 +25,7 @@ public sealed class DeleteOrder
     public static async Task<IResult> Handler(
         [FromRoute] Guid orderId,
         [FromServices] IOrderRepository repository,
+        [FromServices] Bind<OrderCancelled, IPublishEndpoint> publishEndpoint,
         CancellationToken ct = default)
     {
         if (orderId == Guid.Empty)
@@ -43,6 +47,11 @@ public sealed class DeleteOrder
         var updateResult = await repository.UpdateAsync(orderResult.Value, ct);
         if (updateResult.IsFailure)
             return EnvelopedResults.Error(updateResult.Errors);
+
+        await publishEndpoint.Value.Publish(
+            new OrderCancelled(orderId),
+            publishContext => { publishContext.CorrelationId = orderId; },
+            ct);
 
         return EnvelopedResults.Ok(orderResult.Value.Id);
     }

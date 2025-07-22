@@ -1,8 +1,10 @@
 ﻿using Core.Validation;
 using FluentValidation;
 using Framework.Endpoints;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Contracts.DTOs;
+using OrderService.Contracts.Events;
 using OrderService.Contracts.Requests;
 using OrderService.WebAPI.Database;
 using OrderService.WebAPI.Domain;
@@ -26,6 +28,7 @@ public sealed class CreateOrder
     public static async Task<IResult> Handler(
         [FromBody] CreateOrderRequest request,
         [FromServices] IOrderRepository repository,
+        [FromServices] IPublishEndpoint publishEndpoint,
         CancellationToken ct = default)
     {
         var validator = new CreateOrderRequestValidator();
@@ -66,6 +69,14 @@ public sealed class CreateOrder
         var createResult = await repository.CreateAsync(orderResult.Value, ct);
         if (createResult.IsFailure)
             return EnvelopedResults.Error(createResult.Errors);
+
+        await publishEndpoint.Publish(
+            new OrderCreated(
+                OrderId: orderId,
+                Items: request.Items,
+                CustomerId: request.CustomerId),
+            publishContext => { publishContext.CorrelationId = orderId; },
+            ct);
 
         return EnvelopedResults.Ok(orderResult.Value.Id);
     }

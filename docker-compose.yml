@@ -33,7 +33,20 @@
       - minio-directory-data:/data
     command: server --console-address ":9001" /data
     restart: always
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: always
 
 volumes:
   postgres-directory-data:
   minio-directory-data:
+  rabbitmq_data:
