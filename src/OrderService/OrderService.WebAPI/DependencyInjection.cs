@@ -2,8 +2,10 @@
 using Framework.Endpoints;
 using Framework.Logging;
 using Framework.Middlewares;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.WebAPI.Database;
+using OrderService.WebAPI.Messaging;
 
 namespace OrderService.WebAPI;
 
@@ -29,6 +31,32 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddAPILogging(configuration);
+
+
+        var rabbitMQOptions = configuration.GetSection(RabbitMQOptions.SECTION_NAME).Get<RabbitMQOptions>()
+            ?? throw new ApplicationException("RabbitMQ is misconfigured");
+        services.AddMassTransit(config =>
+        {
+            config.AddConfigureEndpointsCallback((context, name, cfg) =>
+            {
+                cfg.UseMessageRetry(r => r.Exponential(
+                    retryLimit: rabbitMQOptions.RetryLimit,
+                    minInterval: TimeSpan.FromSeconds(rabbitMQOptions.RetryMinIntervalSeconds),
+                    maxInterval: TimeSpan.FromSeconds(rabbitMQOptions.RetryMaxIntervalSeconds),
+                    intervalDelta: TimeSpan.FromSeconds(rabbitMQOptions.RetryDeltaSeconds)));
+            });
+
+            config.UsingRabbitMq((ctx, cfg) =>
+            {
+                cfg.Host(new Uri(rabbitMQOptions.Host), c =>
+                {
+                    c.Username(rabbitMQOptions.Username);
+                    c.Password(rabbitMQOptions.Password);
+                });
+
+                cfg.ConfigureEndpoints(ctx);
+            });
+        });
 
         return services;
     }
