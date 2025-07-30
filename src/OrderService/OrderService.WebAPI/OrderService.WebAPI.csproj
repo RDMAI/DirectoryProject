@@ -11,6 +11,7 @@
     <PackageReference Include="Core" Version="1.0.6" />
     <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageReference Include="Framework" Version="1.0.5" />
+    <PackageReference Include="InventoryService.Contracts" Version="1.0.1" />
     <PackageReference Include="MassTransit" Version="8.5.1" />
     <PackageReference Include="MassTransit.AspNetCore" Version="7.3.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.1" />

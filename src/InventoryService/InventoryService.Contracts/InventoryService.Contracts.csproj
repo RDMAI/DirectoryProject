@@ -5,10 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <PackageId>OrderService.Contracts</PackageId>
-    <Version>1.0.3</Version>
+    <PackageId>InventoryService.Contracts</PackageId>
+    <Version>1.0.1</Version>
     <Authors>RDMAI</Authors>
-    <PackageDescription>Contracts for order service</PackageDescription>
+    <PackageDescription>Contracts for inventory service</PackageDescription>
     <RepositoryUrl>https://github.com/RDMAI/DirectoryProject</RepositoryUrl>
   </PropertyGroup>
 

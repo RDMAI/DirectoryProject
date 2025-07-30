@@ -4,8 +4,8 @@ using Framework.Logging;
 using Framework.Middlewares;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using OrderService.Contracts.Messaging;
 using OrderService.WebAPI.Database;
-using OrderService.WebAPI.Messaging;
 
 namespace OrderService.WebAPI;
 
@@ -32,11 +32,12 @@ public static class DependencyInjection
         services.AddSwaggerGen();
         services.AddAPILogging(configuration);
 
-
         var rabbitMQOptions = configuration.GetSection(RabbitMQOptions.SECTION_NAME).Get<RabbitMQOptions>()
             ?? throw new ApplicationException("RabbitMQ is misconfigured");
         services.AddMassTransit(config =>
         {
+            config.AddConsumers(typeof(DependencyInjection).Assembly);
+
             config.AddConfigureEndpointsCallback((context, name, cfg) =>
             {
                 cfg.UseMessageRetry(r => r.Exponential(
