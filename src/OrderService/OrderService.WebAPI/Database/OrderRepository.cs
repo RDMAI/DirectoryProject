@@ -56,7 +56,7 @@ public class OrderRepository : IOrderRepository
 
     public async Task<Result<Order>> GetByIdAsync(
         Guid orderId,
-        Func<IQueryable<Order>, IQueryable<Order>> orderFilter,
+        Func<IQueryable<Order>, IQueryable<Order>>? orderFilter = null,
         CancellationToken ct = default)
     {
         IQueryable<Order> orderQuery = _dbContext.Orders;

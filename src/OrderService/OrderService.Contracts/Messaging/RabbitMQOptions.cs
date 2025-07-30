@@ -1,4 +1,4 @@
-﻿namespace OrderService.WebAPI.Messaging;
+﻿namespace OrderService.Contracts.Messaging;
 
 public record RabbitMQOptions(
     string Host,

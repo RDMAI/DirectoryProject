@@ -2,7 +2,11 @@
 using Framework.Endpoints;
 using Framework.Logging;
 using Framework.Middlewares;
+using InventoryService.WepAPI.Database;
+using InventoryService.WepAPI.ReservationManagement;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
+using OrderService.Contracts.Messaging;
 
 namespace InventoryService.WepAPI;
 
@@ -20,10 +24,42 @@ public static class DependencyInjection
             options.SuppressModelStateInvalidFilter = true;
         });
 
+        var dbConnectionString = configuration.GetConnectionString(ApplicationDBContext.DATABASE_CONFIGURATION);
+        services.AddScoped(_ => new ApplicationDBContext(dbConnectionString));
+
+        services.AddScoped<IReservationService, ReservationService>();
+
         services.AddEndpoints(Assembly.GetExecutingAssembly());
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddAPILogging(configuration);
+
+        var rabbitMQOptions = configuration.GetSection(RabbitMQOptions.SECTION_NAME).Get<RabbitMQOptions>()
+            ?? throw new ApplicationException("RabbitMQ is misconfigured");
+        services.AddMassTransit(config =>
+        {
+            config.AddConsumers(typeof(DependencyInjection).Assembly);
+
+            config.AddConfigureEndpointsCallback((context, name, cfg) =>
+            {
+                cfg.UseMessageRetry(r => r.Exponential(
+                    retryLimit: rabbitMQOptions.RetryLimit,
+                    minInterval: TimeSpan.FromSeconds(rabbitMQOptions.RetryMinIntervalSeconds),
+                    maxInterval: TimeSpan.FromSeconds(rabbitMQOptions.RetryMaxIntervalSeconds),
+                    intervalDelta: TimeSpan.FromSeconds(rabbitMQOptions.RetryDeltaSeconds)));
+            });
+
+            config.UsingRabbitMq((ctx, cfg) =>
+            {
+                cfg.Host(new Uri(rabbitMQOptions.Host), c =>
+                {
+                    c.Username(rabbitMQOptions.Username);
+                    c.Password(rabbitMQOptions.Password);
+                });
+
+                cfg.ConfigureEndpoints(ctx);
+            });
+        });
 
         return services;
     }
@@ -36,6 +72,11 @@ public static class DependencyInjection
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            await using var scope = app.Services.CreateAsyncScope();
+
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDBContext>();
+            await dbContext.ApplyMigrationsAsync();
+
             app.UseSwagger();
             app.UseSwaggerUI();
         }

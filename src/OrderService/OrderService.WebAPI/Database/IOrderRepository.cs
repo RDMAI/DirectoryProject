@@ -10,6 +10,6 @@ public interface IOrderRepository
     Task<Result<Order>> DeleteAsync(Order entity, CancellationToken ct = default);
     Task<Result<Order>> GetByIdAsync(
         Guid orderId,
-        Func<IQueryable<Order>, IQueryable<Order>> orderFilter,
+        Func<IQueryable<Order>, IQueryable<Order>>? orderFilter = null,
         CancellationToken ct = default);
 }
